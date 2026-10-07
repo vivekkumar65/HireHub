@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Applicants - HireHub</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .navbar {
+            height: 72px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .logo span {
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 50px auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 17px;
+        }
+
+        .applicant-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        }
+
+        .job-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 18px;
+        }
+
+        .info {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .info strong {
+            color: #111827;
+        }
+
+        .status-section {
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-section label {
+            font-weight: bold;
+        }
+
+        .status-select {
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .update-btn {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .update-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .empty {
+            background: white;
+            padding: 50px;
+            text-align: center;
+            border-radius: 16px;
+            color: #6b7280;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="recruiter-dashboard.html">Dashboard</a>
+            <a href="my-jobs.html">My Jobs</a>
+            <a href="applicants.html">Applicants</a>
+            <a href="profile.html">Profile</a>
+            <a href="/HireHub/logout">Logout</a>
+        </div>
+
+    </nav>
+
+
+    <main class="container">
+
+        <div class="page-header">
+            <h1>Applicants</h1>
+            <p>View and manage candidates who applied for your jobs.</p>
+        </div>
+
+
+        <div id="applicantsContainer">
+
+            <div class="empty">
+                Loading applicants...
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        OnlineJobPortal
+        <br>
+        © 2026 Online Job Portal. All Rights Reserved.
+    </footer>
+
+
+    <script>
+
+        async function loadApplicants() {
+
+            const container =
+                document.getElementById("applicantsContainer");
+
+            try {
+
+                const response =
+                    await fetch("/HireHub/viewApplicants", {
+                        cache: "no-store"
+                    });
+
+                const html =
+                    await response.text();
+
+                if (!html.trim()) {
+
+                    container.innerHTML = `
+                        <div class="empty">
+                            No applicants found.
+                        </div>
+                    `;
+
+                    return;
+                }
+
+                container.innerHTML = html;
+
+                convertApplicants();
+
+            } catch (error) {
+
+                console.error(error);
+
+                container.innerHTML = `
+                    <div class="empty">
+                        Unable to load applicants.
+                    </div>
+                `;
+            }
+        }
+
+
+        function convertApplicants() {
+
+            const container =
+                document.getElementById("applicantsContainer");
+
+            const text =
+                container.innerText.trim();
+
+            if (!text) {
+
+                container.innerHTML = `
+                    <div class="empty">
+                        No applicants found.
+                    </div>
+                `;
+
+                return;
+            }
+
+            const lines =
+                text.split("\n")
+                    .map(line => line.trim())
+                    .filter(line => line !== "");
+
+            let cards = "";
+            let current = {};
+
+            for (let line of lines) {
+
+                if (line === "Applicants") {
+                    continue;
+                }
+
+                if (line.startsWith("Application ID:")) {
+
+                    if (current.applicationId) {
+                        cards += createCard(current);
+                    }
+
+                    current = {};
+
+                    current.applicationId =
+                        line.replace("Application ID:", "").trim();
+
+                } else if (line.startsWith("Applicant:")) {
+
+                    current.applicant =
+                        line.replace("Applicant:", "").trim();
+
+                } else if (line.startsWith("Email:")) {
+
+                    current.email =
+                        line.replace("Email:", "").trim();
+
+                } else if (line.startsWith("Status:")) {
+
+                    current.status =
+                        line.replace("Status:", "").trim();
+
+                } else if (
+                    line !== "OnlineJobPortal" &&
+                    !line.startsWith("©")
+                ) {
+
+                    if (!current.jobTitle) {
+                        current.jobTitle = line;
+                    }
+                }
+            }
+
+            if (current.applicationId) {
+                cards += createCard(current);
+            }
+
+            if (!cards) {
+
+                container.innerHTML = `
+                    <div class="empty">
+                        No applicants found.
+                    </div>
+                `;
+
+            } else {
+
+                container.innerHTML = cards;
+            }
+        }
+
+
+        function createCard(applicant) {
+
+            const safeStatus =
+                applicant.status || "Applied";
+
+            return `
+                <div class="applicant-card">
+
+                    <div class="job-title">
+                        ${escapeHtml(applicant.jobTitle || "Job")}
+                    </div>
+
+                    <div class="info">
+                        <strong>Application ID:</strong>
+                        ${escapeHtml(applicant.applicationId)}
+                    </div>
+
+                    <div class="info">
+                        <strong>Applicant:</strong>
+                        ${escapeHtml(applicant.applicant || "")}
+                    </div>
+
+                    <div class="info">
+                        <strong>Email:</strong>
+                        ${escapeHtml(applicant.email || "")}
+                    </div>
+
+                    <div class="info">
+                        <strong>Current Status:</strong>
+                        <span class="status-badge">
+                            ${escapeHtml(safeStatus)}
+                        </span>
+                    </div>
+
+                    <div class="status-section">
+
+                        <label>
+                            Update Status:
+                        </label>
+
+                        <select
+                            class="status-select"
+                            id="status-${escapeHtml(applicant.applicationId)}"
+                        >
+
+                            <option value="Applied"
+                                ${safeStatus === "Applied" ? "selected" : ""}>
+                                Applied
+                            </option>
+
+                            <option value="Shortlisted"
+                                ${safeStatus === "Shortlisted" ? "selected" : ""}>
+                                Shortlisted
+                            </option>
+
+                            <option value="Selected"
+                                ${safeStatus === "Selected" ? "selected" : ""}>
+                                Selected
+                            </option>
+
+                            <option value="Rejected"
+                                ${safeStatus === "Rejected" ? "selected" : ""}>
+                                Rejected
+                            </option>
+
+                        </select>
+
+                        <button
+                            class="update-btn"
+                            onclick="updateStatus('${escapeHtml(applicant.applicationId)}')"
+                        >
+                            Update Status
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="message"
+                        id="message-${escapeHtml(applicant.applicationId)}"
+                    ></div>
+
+                </div>
+            `;
+        }
+
+
+        async function updateStatus(applicationId) {
+
+            const select =
+                document.getElementById(
+                    "status-" + applicationId
+                );
+
+            const message =
+                document.getElementById(
+                    "message-" + applicationId
+                );
+
+            const status =
+                select.value;
+
+
+            const formData =
+                new URLSearchParams();
+
+            formData.append(
+                "applicationId",
+                applicationId
+            );
+
+            formData.append(
+                "status",
+                status
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/HireHub/updateStatus",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await response.text();
+
+
+                if (response.ok) {
+
+                    message.style.color = "#16a34a";
+
+                    message.innerText =
+                        "Status updated successfully.";
+
+                    setTimeout(() => {
+                        loadApplicants();
+                    }, 800);
+
+                } else {
+
+                    message.style.color = "#dc2626";
+
+                    message.innerText =
+                        "Unable to update status.";
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.style.color = "#dc2626";
+
+                message.innerText =
+                    "Something went wrong.";
+            }
+        }
+
+
+        function escapeHtml(value) {
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        loadApplicants();
+
+    </script>
+
+</body>
+</html>

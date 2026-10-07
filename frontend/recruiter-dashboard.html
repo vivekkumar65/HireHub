@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate">
+
+    <meta http-equiv="Pragma"
+          content="no-cache">
+
+    <meta http-equiv="Expires"
+          content="0">
+
+    <title>Recruiter Dashboard - HireHub</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+</head>
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Hire<span>Hub</span>
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="recruiter-dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="my-jobs.html">
+                My Jobs
+            </a>
+
+            <a href="view-applicants.html">
+                Applicants
+            </a>
+
+            <a href="profile.html">
+                My Profile
+            </a>
+
+        </div>
+
+
+        <div class="nav-buttons">
+
+            <button class="login-btn">
+                🏢 Recruiter
+            </button>
+
+            <button
+                class="register-btn"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <section class="dashboard-header">
+
+        <div>
+
+            <p class="welcome">
+                RECRUITER DASHBOARD
+            </p>
+
+            <h1>
+
+                Welcome back,
+
+                <span id="recruiterName">
+                    Recruiter!
+                </span>
+
+                👋
+
+            </h1>
+
+            <p>
+
+                Manage your job postings, applicants
+                and recruitment process from one place.
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <section class="dashboard-section">
+
+
+        <div class="dashboard-cards">
+
+
+            <!-- ================= POST JOB ================= -->
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    ➕
+                </div>
+
+                <h2>
+                    Post a Job
+                </h2>
+
+                <p>
+
+                    Create and publish a new
+                    job opportunity.
+
+                </p>
+
+                <button onclick="postJob()">
+
+                    Post Job
+
+                </button>
+
+            </div>
+
+
+            <!-- ================= MY JOBS ================= -->
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    💼
+                </div>
+
+                <h2>
+                    My Jobs
+                </h2>
+
+                <p>
+
+                    View and manage the jobs
+                    you have posted.
+
+                </p>
+
+                <button onclick="myJobs()">
+
+                    View My Jobs
+
+                </button>
+
+            </div>
+
+
+            <!-- ================= APPLICANTS ================= -->
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    👥
+                </div>
+
+                <h2>
+                    Applicants
+                </h2>
+
+                <p>
+
+                    View candidates who applied
+                    for your jobs.
+
+                </p>
+
+                <button onclick="viewApplicants()">
+
+                    View Applicants
+
+                </button>
+
+            </div>
+
+
+            <!-- ================= PROFILE ================= -->
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    👤
+                </div>
+
+                <h2>
+                    My Profile
+                </h2>
+
+                <p>
+
+                    View and manage your
+                    recruiter profile.
+
+                </p>
+
+                <button onclick="viewProfile()">
+
+                    View Profile
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ================= QUICK ACTIONS ================= -->
+
+        <div class="quick-actions">
+
+            <h2>
+                Quick Actions
+            </h2>
+
+
+            <div class="action-buttons">
+
+
+                <!-- POST JOB -->
+
+                <button onclick="postJob()">
+
+                    ➕ Post Job
+
+                </button>
+
+
+                <!-- MY JOBS -->
+
+                <button onclick="myJobs()">
+
+                    💼 My Jobs
+
+                </button>
+
+
+                <!-- APPLICANTS -->
+
+                <button onclick="viewApplicants()">
+
+                    👥 Applicants
+
+                </button>
+
+
+                <!-- UPDATE APPLICATION STATUS -->
+
+                <button onclick="updateStatus()">
+
+                    🔄 Update Application Status
+
+                </button>
+
+
+                <!-- EDIT JOB -->
+
+                <button onclick="editJob()">
+
+                    ✏️ Edit Job
+
+                </button>
+
+
+                <!-- DELETE JOB -->
+
+                <button onclick="deleteJob()">
+
+                    🗑️ Delete Job
+
+                </button>
+
+
+                <!-- PROFILE -->
+
+                <button onclick="viewProfile()">
+
+                    👤 My Profile
+
+                </button>
+
+
+                <!-- CHANGE PASSWORD -->
+
+                <button onclick="changePassword()">
+
+                    🔑 Change Password
+
+                </button>
+
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="logo">
+
+            Hire<span>Hub</span>
+
+        </div>
+
+        <p>
+
+            © 2026 HireHub. All Rights Reserved.
+
+        </p>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+
+        // ==========================================
+        // CHECK RECRUITER SESSION
+        // ==========================================
+
+        function checkRecruiterSession() {
+
+            fetch(
+                "/HireHub/profile",
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            )
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Session expired"
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(user) {
+
+
+                if (
+                    !user ||
+                    !user.name
+                ) {
+
+                    window.location.replace(
+                        "/HireHub/login.html"
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    !user.role ||
+                    user.role
+                        .trim()
+                        .toLowerCase()
+                    !== "recruiter"
+                ) {
+
+                    window.location.replace(
+                        "/HireHub/login.html"
+                    );
+
+                    return;
+
+                }
+
+
+                document.getElementById(
+                    "recruiterName"
+                ).innerText =
+                    user.name + "!";
+
+            })
+
+            .catch(function() {
+
+                window.location.replace(
+                    "/HireHub/login.html"
+                );
+
+            });
+
+        }
+
+
+        // ==========================================
+        // POST JOB
+        // ==========================================
+
+        function postJob() {
+
+            window.location.href =
+                "post-job.html";
+
+        }
+
+
+        // ==========================================
+        // MY JOBS
+        // ==========================================
+
+        function myJobs() {
+
+            window.location.href =
+                "my-jobs.html";
+
+        }
+
+
+        // ==========================================
+        // APPLICANTS
+        // ==========================================
+
+        function viewApplicants() {
+
+            window.location.href =
+                "view-applicants.html";
+
+        }
+
+
+        // ==========================================
+        // UPDATE APPLICATION STATUS
+        // ==========================================
+
+        function updateStatus() {
+
+            /*
+             * Application ID is not known here.
+             *
+             * So first open Applicants page.
+             *
+             * From Applicants page the system
+             * automatically sends the correct
+             * applicationId to update-status.html.
+             */
+
+            window.location.href =
+                "view-applicants.html";
+
+        }
+
+
+        // ==========================================
+        // EDIT JOB
+        // ==========================================
+
+        function editJob() {
+
+            /*
+             * Job ID is not known here.
+             *
+             * So first open My Jobs.
+             *
+             * From My Jobs page the recruiter
+             * can select the required job and
+             * click Edit.
+             */
+
+            window.location.href =
+                "my-jobs.html";
+
+        }
+
+
+        // ==========================================
+        // DELETE JOB
+        // ==========================================
+
+        function deleteJob() {
+
+            /*
+             * Job ID is not known here.
+             *
+             * So first open My Jobs.
+             *
+             * From My Jobs page the recruiter
+             * can select the required job and
+             * click Delete.
+             */
+
+            window.location.href =
+                "my-jobs.html";
+
+        }
+
+
+        // ==========================================
+        // PROFILE
+        // ==========================================
+
+        function viewProfile() {
+
+            window.location.href =
+                "profile.html";
+
+        }
+
+
+        // ==========================================
+        // CHANGE PASSWORD
+        // ==========================================
+
+        function changePassword() {
+
+            window.location.href =
+                "change-password.html";
+
+        }
+
+
+        // ==========================================
+        // LOGOUT
+        // ==========================================
+
+        function logout() {
+
+            window.location.replace(
+                "/HireHub/logout"
+            );
+
+        }
+
+
+        // ==========================================
+        // PAGE LOAD
+        // ==========================================
+
+        checkRecruiterSession();
+
+
+        // ==========================================
+        // BACK / FORWARD CHECK
+        // ==========================================
+
+        window.addEventListener(
+            "pageshow",
+            function() {
+
+                checkRecruiterSession();
+
+            }
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>

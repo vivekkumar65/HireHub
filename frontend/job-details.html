@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Job Details - Online Job Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        #applyButton {
+            display: none !important;
+        }
+
+        #applyButton.show-apply {
+            display: block !important;
+        }
+
+        #applyButton.already-applied {
+            display: block !important;
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="jobseeker-dashboard.html">Dashboard</a>
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn"
+                onclick="window.location.href='login.html'">
+                Login
+            </button>
+
+            <button class="register-btn"
+                onclick="window.location.href='register.html'">
+                Register
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <section class="job-details-header">
+
+        <div class="job-company-icon" id="jobIcon">
+            💼
+        </div>
+
+        <div>
+
+            <p>JOB OPPORTUNITY</p>
+
+            <h1 id="jobTitle">
+                Loading...
+            </h1>
+
+            <h3 id="companyName">
+                Loading...
+            </h3>
+
+        </div>
+
+    </section>
+
+
+    <section class="job-details-section">
+
+        <div class="job-details-main">
+
+            <div class="details-box">
+
+                <h2>Job Description</h2>
+
+                <p id="jobDescription">
+                    Loading job description...
+                </p>
+
+            </div>
+
+
+            <div class="details-box">
+
+                <h2>Required Skills</h2>
+
+                <div class="details-skills" id="jobSkills">
+                </div>
+
+            </div>
+
+
+            <div class="details-box">
+
+                <h2>Responsibilities</h2>
+
+                <ul id="jobResponsibilities">
+
+                    <li>
+                        Responsibilities will be available soon.
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+
+        <aside class="job-summary">
+
+            <h2>Job Summary</h2>
+
+            <div class="summary-item">
+
+                <span>📍 Location</span>
+
+                <strong id="jobLocation">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>💰 Salary</span>
+
+                <strong id="jobSalary">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>💼 Job Type</span>
+
+                <strong>
+                    Full Time
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>🎓 Experience</span>
+
+                <strong>
+                    Fresher
+                </strong>
+
+            </div>
+
+
+            <button
+                id="applyButton"
+                class="apply-large-btn"
+                onclick="applyJob()">
+
+                Apply Now
+
+            </button>
+
+
+            <button
+                class="back-btn"
+                onclick="window.location.href='jobs.html'">
+
+                ← Back to Jobs
+
+            </button>
+
+        </aside>
+
+    </section>
+
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        // ==========================================
+        // SESSION CHECK
+        // ==========================================
+
+        function checkSession() {
+
+            fetch(
+                "/HireHub/profile",
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            )
+
+            .then(function(response) {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Session expired"
+                    );
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(user) {
+
+                if (
+                    !user ||
+                    !user.name
+                ) {
+
+                    window.location.replace(
+                        "/HireHub/login.html"
+                    );
+
+                    return;
+                }
+
+                loadJobDetails();
+                checkUserStatus();
+
+            })
+
+            .catch(function(error) {
+
+                console.log(
+                    "Session check failed."
+                );
+
+                window.location.replace(
+                    "/HireHub/login.html"
+                );
+
+            });
+
+        }
+
+
+        // ==========================================
+        // LOAD JOB DETAILS
+        // ==========================================
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const jobId =
+            urlParams.get("jobId");
+
+
+        function loadJobDetails() {
+
+            if (!jobId) {
+
+                document.getElementById("jobTitle")
+                    .innerText =
+                    "Job Not Found";
+
+                document.getElementById("companyName")
+                    .innerText = "";
+
+                document.getElementById("jobDescription")
+                    .innerText =
+                    "No job was selected.";
+
+                return;
+            }
+
+
+            fetch(
+                "/HireHub/jobDetails?jobId=" +
+                encodeURIComponent(jobId),
+                {
+                    cache: "no-store"
+                }
+            )
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to load job."
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(job) {
+
+                if (job.error) {
+
+                    document.getElementById("jobTitle")
+                        .innerText =
+                        "Job Not Found";
+
+                    document.getElementById("companyName")
+                        .innerText = "";
+
+                    document.getElementById("jobDescription")
+                        .innerText =
+                        job.error;
+
+                    return;
+                }
+
+
+                document.getElementById("jobTitle")
+                    .innerText =
+                    job.title || "";
+
+
+                document.getElementById("companyName")
+                    .innerText =
+                    job.company || "";
+
+
+                document.getElementById("jobLocation")
+                    .innerText =
+                    job.location || "-";
+
+
+                document.getElementById("jobSalary")
+                    .innerText =
+                    job.salary || "-";
+
+
+                document.getElementById("jobDescription")
+                    .innerText =
+                    job.description ||
+                    "No description available.";
+
+
+                const skillsBox =
+                    document.getElementById(
+                        "jobSkills"
+                    );
+
+                skillsBox.innerHTML = "";
+
+
+                if (job.skills) {
+
+                    const skills =
+                        job.skills.split(",");
+
+
+                    skills.forEach(
+                        function(skill) {
+
+                            const span =
+                                document.createElement(
+                                    "span"
+                                );
+
+                            span.innerText =
+                                skill.trim();
+
+                            skillsBox.appendChild(
+                                span
+                            );
+
+                        }
+                    );
+
+                }
+
+            })
+
+            .catch(function(error) {
+
+                console.error(error);
+
+                document.getElementById("jobTitle")
+                    .innerText =
+                    "Unable to Load Job";
+
+                document.getElementById("companyName")
+                    .innerText = "";
+
+                document.getElementById("jobDescription")
+                    .innerText =
+                    "Unable to load job details.";
+
+            });
+
+        }
+
+
+        // ==========================================
+        // CHECK USER STATUS
+        // ==========================================
+
+        function checkUserStatus() {
+
+            const applyButton =
+                document.getElementById(
+                    "applyButton"
+                );
+
+
+            if (!applyButton) {
+                return;
+            }
+
+
+            fetch(
+                "/HireHub/profile",
+                {
+                    cache: "no-store"
+                }
+            )
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "User not logged in"
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(user) {
+
+                if (
+                    user.role &&
+                    user.role.trim()
+                        .toLowerCase() ===
+                    "job seeker"
+                ) {
+
+                    checkAlreadyApplied(
+                        applyButton
+                    );
+
+                } else {
+
+                    hideApplyButton(
+                        applyButton
+                    );
+
+                }
+
+            })
+
+            .catch(function() {
+
+                hideApplyButton(
+                    applyButton
+                );
+
+            });
+
+        }
+
+
+        // ==========================================
+        // CHECK ALREADY APPLIED
+        // ==========================================
+
+        function checkAlreadyApplied(
+            applyButton
+        ) {
+
+            applyButton.classList.remove(
+                "show-apply"
+            );
+
+            applyButton.classList.remove(
+                "already-applied"
+            );
+
+            applyButton.disabled = true;
+
+
+            fetch(
+                "/HireHub/myApplications",
+                {
+                    cache: "no-store"
+                }
+            )
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Unable to check applications."
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(applications) {
+
+                let alreadyApplied = false;
+
+
+                if (
+                    Array.isArray(
+                        applications
+                    )
+                ) {
+
+                    applications.forEach(
+                        function(application) {
+
+                            if (
+                                application.jobId !== undefined &&
+                                application.jobId !== null &&
+                                String(
+                                    application.jobId
+                                ) === String(jobId)
+                            ) {
+
+                                alreadyApplied = true;
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                if (alreadyApplied) {
+
+                    applyButton.innerText =
+                        "Already Applied";
+
+                    applyButton.disabled = true;
+
+                    applyButton.classList.add(
+                        "already-applied"
+                    );
+
+                    applyButton.classList.remove(
+                        "show-apply"
+                    );
+
+                } else {
+
+                    applyButton.innerText =
+                        "Apply Now";
+
+                    applyButton.disabled = false;
+
+                    applyButton.classList.remove(
+                        "already-applied"
+                    );
+
+                    applyButton.classList.add(
+                        "show-apply"
+                    );
+
+                }
+
+            })
+
+            .catch(function(error) {
+
+                console.error(
+                    "Application check error:",
+                    error
+                );
+
+                applyButton.innerText =
+                    "Unable to Check";
+
+                applyButton.disabled = true;
+
+                applyButton.classList.remove(
+                    "show-apply"
+                );
+
+            });
+
+        }
+
+
+        // ==========================================
+        // HIDE APPLY BUTTON
+        // ==========================================
+
+        function hideApplyButton(
+            applyButton
+        ) {
+
+            applyButton.disabled = true;
+
+            applyButton.classList.remove(
+                "show-apply"
+            );
+
+            applyButton.classList.remove(
+                "already-applied"
+            );
+
+        }
+
+
+        // ==========================================
+        // APPLY JOB
+        // ==========================================
+
+        function applyJob() {
+
+            const applyButton =
+                document.getElementById(
+                    "applyButton"
+                );
+
+
+            if (!jobId) {
+
+                alert(
+                    "Job ID not found!"
+                );
+
+                return;
+            }
+
+
+            if (
+                applyButton.disabled
+            ) {
+
+                return;
+            }
+
+
+            const form =
+                document.createElement(
+                    "form"
+                );
+
+
+            form.method =
+                "POST";
+
+            form.action =
+                "/HireHub/applyJob";
+
+
+            const input =
+                document.createElement(
+                    "input"
+                );
+
+
+            input.type =
+                "hidden";
+
+            input.name =
+                "jobId";
+
+            input.value =
+                jobId;
+
+
+            form.appendChild(
+                input
+            );
+
+
+            document.body.appendChild(
+                form
+            );
+
+
+            form.submit();
+
+        }
+
+
+        // ==========================================
+        // PAGE LOAD
+        // ==========================================
+
+        checkSession();
+
+
+        // ==========================================
+        // BACK / FORWARD CACHE CHECK
+        // ==========================================
+
+        window.addEventListener(
+            "pageshow",
+            function(event) {
+
+                checkSession();
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

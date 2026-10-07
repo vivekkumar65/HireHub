@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile - HireHub</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="jobs.html">
+                Jobs
+            </a>
+
+            <a href="recruiter-dashboard.html">
+                Dashboard
+            </a>
+
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn"
+                    onclick="window.location.href='profile.html'">
+
+                👤 Profile
+
+            </button>
+
+            <button class="register-btn"
+                    onclick="window.location.href='recruiter-dashboard.html'">
+
+                Dashboard
+
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <section class="jobs-header">
+
+        <h1>
+            Edit Profile
+        </h1>
+
+        <p>
+            Update your account information.
+        </p>
+
+    </section>
+
+
+    <section class="form-container">
+
+        <form action="/HireHub/editProfile"
+              method="POST">
+
+            <label>
+                Name
+            </label>
+
+            <input
+                type="text"
+                name="name"
+                id="name"
+                required
+            >
+
+
+            <label>
+                Email
+            </label>
+
+            <input
+                type="email"
+                name="email"
+                id="email"
+                required
+            >
+
+
+            <label>
+                Role
+            </label>
+
+            <input
+                type="text"
+                id="role"
+                readonly
+            >
+
+
+            <button
+                type="submit"
+                class="apply-large-btn"
+                style="width:100%; margin-top:20px;">
+
+                💾 Save Changes
+
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal.
+            All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        fetch("/HireHub/profile")
+
+            .then(function(response) {
+
+                return response.json();
+
+            })
+
+            .then(function(data) {
+
+                if (data.error) {
+
+                    alert(data.error);
+
+                    window.location.href =
+                        "login.html";
+
+                    return;
+                }
+
+                document.getElementById("name").value =
+                    data.name;
+
+                document.getElementById("email").value =
+                    data.email;
+
+                document.getElementById("role").value =
+                    data.role;
+
+            })
+
+            .catch(function(error) {
+
+                console.error(error);
+
+                alert(
+                    "Unable to load profile."
+                );
+
+            });
+
+    </script>
+
+</body>
+
+</html>

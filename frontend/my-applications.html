@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Applications - Online Job Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        body {
+            background: #f5f8ff;
+        }
+
+        .applications-header {
+            background: linear-gradient(
+                135deg,
+                #eef5ff,
+                #ffffff
+            );
+
+            padding: 70px 8% 50px;
+        }
+
+        .applications-header p {
+            color: #2563eb;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .applications-header h1 {
+            font-size: 42px;
+            margin: 10px 0;
+            color: #172033;
+        }
+
+        .applications-header span {
+            color: #2563eb;
+        }
+
+        .applications-header .subtitle {
+            color: #64748b;
+            font-size: 17px;
+        }
+
+
+        .applications-section {
+            padding: 50px 8%;
+            min-height: 500px;
+        }
+
+
+        .applications-container {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(320px, 1fr)
+            );
+
+            gap: 25px;
+        }
+
+
+        .application-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px;
+
+            box-shadow:
+                0 8px 25px rgba(15, 23, 42, 0.06);
+
+            transition: 0.3s;
+        }
+
+
+        .application-card:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 15px 35px rgba(15, 23, 42, 0.10);
+        }
+
+
+        .application-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+
+        .application-icon {
+            width: 55px;
+            height: 55px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #eff6ff;
+            border-radius: 14px;
+
+            font-size: 27px;
+        }
+
+
+        .application-card h2 {
+            margin: 0;
+            color: #172033;
+            font-size: 22px;
+        }
+
+
+        .application-card .company {
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+
+        .status {
+            padding: 7px 13px;
+            border-radius: 20px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            background: #eff6ff;
+            color: #2563eb;
+
+            white-space: nowrap;
+        }
+
+
+        .application-info {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 18px;
+        }
+
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+
+            padding: 9px 0;
+
+            color: #64748b;
+        }
+
+
+        .info-row strong {
+            color: #172033;
+        }
+
+
+        .empty-state {
+            text-align: center;
+            background: white;
+
+            padding: 60px 20px;
+
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+
+        .empty-state .empty-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+
+        .empty-state h2 {
+            color: #172033;
+        }
+
+
+        .empty-state p {
+            color: #64748b;
+        }
+
+
+        .page-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+            flex-wrap: wrap;
+        }
+
+
+        .page-buttons a {
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 9px;
+
+            font-weight: 600;
+        }
+
+
+        .primary-button {
+            background: #2563eb;
+            color: white;
+        }
+
+
+        .secondary-button {
+            background: white;
+            color: #2563eb;
+
+            border: 1px solid #2563eb;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .applications-header h1 {
+                font-size: 32px;
+            }
+
+            .application-top {
+                flex-direction: column;
+            }
+
+            .status {
+                align-self: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="jobs.html">
+                Jobs
+            </a>
+
+            <a href="jobseeker-dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="profile.html">
+                Profile
+            </a>
+
+        </div>
+
+
+        <div class="nav-buttons">
+
+            <button
+                class="login-btn"
+                onclick="window.location.href='profile.html'">
+
+                👤 Profile
+
+            </button>
+
+
+            <button
+                class="register-btn"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <section class="applications-header">
+
+        <p>
+            JOB SEEKER DASHBOARD
+        </p>
+
+
+        <h1>
+            My <span>Applications</span>
+        </h1>
+
+
+        <p class="subtitle">
+            Track your job applications and check their current status.
+        </p>
+
+    </section>
+
+
+    <!-- ================= APPLICATIONS ================= -->
+
+    <section class="applications-section">
+
+        <div
+            id="applicationsContainer"
+            class="applications-container">
+
+        </div>
+
+
+        <!-- Empty State -->
+
+        <div
+            id="emptyState"
+            class="empty-state"
+            style="display: none;">
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h2>
+                No Applications Yet
+            </h2>
+
+            <p>
+                You haven't applied for any jobs yet.
+                Explore available jobs and start applying.
+            </p>
+
+            <div class="page-buttons">
+
+                <a
+                    href="jobs.html"
+                    class="primary-button">
+
+                    Browse Jobs
+
+                </a>
+
+                <a
+                    href="jobseeker-dashboard.html"
+                    class="secondary-button">
+
+                    Back to Dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Buttons -->
+
+        <div
+            id="pageButtons"
+            class="page-buttons"
+            style="display: none;">
+
+            <a
+                href="jobs.html"
+                class="primary-button">
+
+                Browse More Jobs
+
+            </a>
+
+            <a
+                href="jobseeker-dashboard.html"
+                class="secondary-button">
+
+                Dashboard
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+
+        // ==================================================
+        // LOAD APPLICATIONS
+        // ==================================================
+
+        fetch("/HireHub/myApplications")
+
+            .then(function(response) {
+
+                return response.json();
+
+            })
+
+            .then(function(applications) {
+
+                const container =
+                    document.getElementById(
+                        "applicationsContainer"
+                    );
+
+                const emptyState =
+                    document.getElementById(
+                        "emptyState"
+                    );
+
+                const pageButtons =
+                    document.getElementById(
+                        "pageButtons"
+                    );
+
+
+                container.innerHTML = "";
+
+
+                // No applications
+
+                if (
+                    !Array.isArray(applications) ||
+                    applications.length === 0
+                ) {
+
+                    emptyState.style.display =
+                        "block";
+
+                    return;
+
+                }
+
+
+                // Applications exist
+
+                applications.forEach(
+                    function(application) {
+
+                        const card =
+                            document.createElement(
+                                "div"
+                            );
+
+                        card.className =
+                            "application-card";
+
+
+                        const status =
+                            application.status ||
+                            "Applied";
+
+
+                        card.innerHTML = `
+
+                            <div class="application-top">
+
+                                <div style="
+                                    display:flex;
+                                    gap:15px;
+                                    align-items:center;
+                                ">
+
+                                    <div class="application-icon">
+                                        💼
+                                    </div>
+
+                                    <div>
+
+                                        <h2>
+                                            ${application.title}
+                                        </h2>
+
+                                        <div class="company">
+                                            ${application.company}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="status">
+                                    ${status}
+                                </div>
+
+                            </div>
+
+
+                            <div class="application-info">
+
+                                <div class="info-row">
+
+                                    <span>
+                                        Application ID
+                                    </span>
+
+                                    <strong>
+                                        #${application.applicationId}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-row">
+
+                                    <span>
+                                        📍 Location
+                                    </span>
+
+                                    <strong>
+                                        ${application.location}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-row">
+
+                                    <span>
+                                        📊 Status
+                                    </span>
+
+                                    <strong>
+                                        ${status}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+
+                        container.appendChild(card);
+
+                    }
+                );
+
+
+                pageButtons.style.display =
+                    "flex";
+
+            })
+
+
+            .catch(function(error) {
+
+                console.error(error);
+
+                document.getElementById(
+                    "emptyState"
+                ).style.display = "block";
+
+            });
+
+
+        // ==================================================
+        // LOGOUT
+        // ==================================================
+
+        function logout() {
+
+            window.location.href =
+                "/HireHub/logout";
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

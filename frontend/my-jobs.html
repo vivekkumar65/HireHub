@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Jobs - HireHub</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="recruiter-dashboard.html">Dashboard</a>
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn">
+                🏢 Recruiter
+            </button>
+
+            <button class="register-btn"
+                    onclick="window.location.href='recruiter-dashboard.html'">
+                Dashboard
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HEADER -->
+
+    <section class="jobs-header">
+
+        <h1>
+            My Jobs
+        </h1>
+
+        <p>
+            Manage the jobs you have posted.
+        </p>
+
+    </section>
+
+
+    <!-- JOBS -->
+
+    <section class="jobs-container"
+             id="jobsContainer">
+
+        <p style="text-align:center;">
+            Loading your jobs...
+        </p>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal.
+            All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        function loadMyJobs() {
+
+            fetch("/HireHub/myJobs")
+
+                .then(function(response) {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Unable to load jobs"
+                        );
+                    }
+
+                    return response.text();
+
+                })
+
+                .then(function(data) {
+
+                    document.getElementById(
+                        "jobsContainer"
+                    ).innerHTML = data;
+
+                })
+
+                .catch(function(error) {
+
+                    console.error(error);
+
+                    document.getElementById(
+                        "jobsContainer"
+                    ).innerHTML =
+                        "<p style='text-align:center;'>"
+                        + "Unable to load your jobs."
+                        + "</p>";
+
+                });
+
+        }
+
+
+        loadMyJobs();
+
+    </script>
+
+</body>
+
+</html>

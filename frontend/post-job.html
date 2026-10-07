@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Post Job - HireHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="jobs.html">
+                Jobs
+            </a>
+
+            <a href="recruiter-dashboard.html">
+                Dashboard
+            </a>
+
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn"
+                onclick="window.location.href='login.html'">
+
+                Login
+
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <section class="jobs-header">
+
+        <h1>
+            Post a New Job
+        </h1>
+
+        <p>
+            Find the right candidate for your company.
+        </p>
+
+    </section>
+
+
+    <!-- ================= POST JOB FORM ================= -->
+
+    <section
+        style="
+        max-width:700px;
+        margin:40px auto;
+        padding:30px;
+        background:white;
+        border-radius:12px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        "
+    >
+
+        <form
+            action="/HireHub/postJob"
+            method="POST"
+        >
+
+            <!-- Job Title -->
+
+            <label>
+                Job Title
+            </label>
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Example: Java Developer"
+                required
+                style="
+                width:100%;
+                padding:12px;
+                margin:8px 0 20px;
+                "
+            >
+
+
+            <!-- Company -->
+
+            <label>
+                Company Name
+            </label>
+
+            <input
+                type="text"
+                name="company"
+                placeholder="Example: ABC Technologies"
+                required
+                style="
+                width:100%;
+                padding:12px;
+                margin:8px 0 20px;
+                "
+            >
+
+
+            <!-- Location -->
+
+            <label>
+                Location
+            </label>
+
+            <input
+                type="text"
+                name="location"
+                placeholder="Example: Noida"
+                required
+                style="
+                width:100%;
+                padding:12px;
+                margin:8px 0 20px;
+                "
+            >
+
+
+            <!-- Salary -->
+
+            <label>
+                Salary
+            </label>
+
+            <input
+                type="text"
+                name="salary"
+                placeholder="Example: 6 LPA"
+                required
+                style="
+                width:100%;
+                padding:12px;
+                margin:8px 0 20px;
+                "
+            >
+
+
+            <!-- Skills -->
+
+            <label>
+                Required Skills
+            </label>
+
+            <input
+                type="text"
+                name="skills"
+                placeholder="Example: Java, MySQL, OOP, JDBC"
+                required
+                style="
+                width:100%;
+                padding:12px;
+                margin:8px 0 20px;
+                "
+            >
+
+
+            <!-- Description -->
+
+            <label>
+                Job Description
+            </label>
+
+            <textarea
+                name="description"
+                placeholder="Enter job description..."
+                required
+                rows="6"
+                style="
+                width:100%;
+                padding:12px;
+                margin:8px 0 20px;
+                resize:vertical;
+                "
+            ></textarea>
+
+
+            <!-- Submit -->
+
+            <button
+                type="submit"
+                class="apply-large-btn"
+                style="width:100%;"
+            >
+
+                Post Job
+
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal.
+            All Rights Reserved.
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

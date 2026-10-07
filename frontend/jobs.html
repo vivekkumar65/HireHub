@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Jobs - Online Job Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        /* ================= SEARCH BAR ================= */
+
+        .job-search {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+            box-sizing: border-box;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 750px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box input {
+            flex: 1;
+            height: 50px;
+            padding: 0 18px;
+            border: 1px solid #d9e0ea;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-box input:focus {
+            border-color: #2563eb;
+        }
+
+        .search-button {
+            height: 50px;
+            padding: 0 28px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .search-button:hover {
+            background: #1d4ed8;
+        }
+
+        .clear-button {
+            height: 50px;
+            padding: 0 22px;
+            border: 1px solid #d9e0ea;
+            border-radius: 10px;
+            background: white;
+            color: #334155;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .clear-button:hover {
+            background: #f1f5f9;
+        }
+
+        @media (max-width: 700px) {
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box input,
+            .search-button,
+            .clear-button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="jobseeker-dashboard.html">Dashboard</a>
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn"
+                onclick="window.location.href='login.html'">
+                Login
+            </button>
+
+            <button class="register-btn"
+                onclick="window.location.href='register.html'">
+                Register
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= JOB HEADER ================= -->
+
+    <section class="jobs-header">
+
+        <h1>Find Your Dream Job</h1>
+
+        <p>
+            Explore the latest job opportunities and
+            start your career journey.
+        </p>
+
+    </section>
+
+
+    <!-- ================= SEARCH ================= -->
+
+    <section class="job-search">
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by job title, company, location or skill..."
+                onkeydown="handleSearchKey(event)">
+
+            <button
+                class="search-button"
+                onclick="searchJobs()">
+                🔍 Search
+            </button>
+
+            <button
+                class="clear-button"
+                onclick="clearSearch()">
+                Clear
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= JOBS ================= -->
+
+    <section
+        class="jobs-container"
+        id="jobsContainer">
+
+        <p id="loading">
+            Loading jobs...
+        </p>
+
+    </section>
+
+
+    <!-- ================= NO JOB MESSAGE ================= -->
+
+    <p
+        id="noJobs"
+        style="display:none; text-align:center; margin:40px;">
+
+        No jobs found.
+
+    </p>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        // ================= LOAD JOBS =================
+
+        function loadJobs() {
+
+            fetch("/HireHub/jobs", {
+                cache: "no-store"
+            })
+
+            .then(function(response) {
+
+                if (!response.ok) {
+                    throw new Error("Unable to load jobs");
+                }
+
+                return response.text();
+
+            })
+
+            .then(function(data) {
+
+                document.getElementById("jobsContainer")
+                    .innerHTML = data;
+
+                document.getElementById("noJobs")
+                    .style.display = "none";
+
+            })
+
+            .catch(function(error) {
+
+                console.error(error);
+
+                document.getElementById("jobsContainer")
+                    .innerHTML =
+                    "<p style='text-align:center;'>" +
+                    "Unable to load jobs." +
+                    "</p>";
+
+            });
+
+        }
+
+
+        // ================= SEARCH =================
+
+        function searchJobs() {
+
+            let input =
+                document.getElementById("searchInput")
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+
+            let jobs =
+                document.querySelectorAll(".job-card");
+
+
+            let found = false;
+
+
+            jobs.forEach(function(job) {
+
+                let jobTitle =
+                    job.querySelector("h2");
+
+                let company =
+                    job.querySelector(".job-card-top p");
+
+                let jobInfo =
+                    job.querySelector(".job-info");
+
+                let skills =
+                    job.querySelector(".job-skills");
+
+
+                let titleText =
+                    jobTitle
+                        ? jobTitle.innerText.toLowerCase()
+                        : "";
+
+
+                let companyText =
+                    company
+                        ? company.innerText.toLowerCase()
+                        : "";
+
+
+                let infoText =
+                    jobInfo
+                        ? jobInfo.innerText.toLowerCase()
+                        : "";
+
+
+                let skillsText =
+                    skills
+                        ? skills.innerText.toLowerCase()
+                        : "";
+
+
+                let searchableText =
+                    titleText +
+                    " " +
+                    companyText +
+                    " " +
+                    infoText +
+                    " " +
+                    skillsText;
+
+
+                if (
+                    input === "" ||
+                    searchableText.includes(input)
+                ) {
+
+                    job.style.display = "";
+
+                    found = true;
+
+                } else {
+
+                    job.style.display = "none";
+
+                }
+
+            });
+
+
+            if (found) {
+
+                document.getElementById("noJobs")
+                    .style.display = "none";
+
+            } else {
+
+                document.getElementById("noJobs")
+                    .style.display = "block";
+
+            }
+
+        }
+
+
+        // ================= ENTER KEY =================
+
+        function handleSearchKey(event) {
+
+            if (event.key === "Enter") {
+
+                searchJobs();
+
+            }
+
+        }
+
+
+        // ================= CLEAR SEARCH =================
+
+        function clearSearch() {
+
+            document.getElementById("searchInput")
+                .value = "";
+
+            searchJobs();
+
+        }
+
+
+        // ================= START =================
+
+        loadJobs();
+
+    </script>
+
+</body>
+
+</html>

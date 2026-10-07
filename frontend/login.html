@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Login - Online Job Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#jobs">Jobs</a>
+            <a href="index.html#about">About</a>
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn">
+                Login
+            </button>
+
+            <button
+                class="register-btn"
+                onclick="window.location.href='register.html'">
+                Register
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <section class="login-section">
+
+        <div class="login-card">
+
+            <div class="login-header">
+
+                <div class="login-icon">
+                    🔐
+                </div>
+
+                <h1>Welcome Back!</h1>
+
+                <p>
+                    Login to your Online Job Portal account
+                </p>
+
+            </div>
+
+
+            <form
+                action="/HireHub/login"
+                method="POST"
+                autocomplete="off"
+            >
+
+                <div class="input-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="role">
+                        Login As
+                    </label>
+
+                    <select
+                        id="role"
+                        name="role"
+                        autocomplete="off"
+                        required
+                    >
+
+                        <option value="">
+                            Select your role
+                        </option>
+
+                        <option value="job seeker">
+                            Job Seeker
+                        </option>
+
+                        <option value="recruiter">
+                            Recruiter
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="main-login-btn">
+
+                    Login
+
+                </button>
+
+            </form>
+
+
+            <div class="register-text">
+
+                Don't have an account?
+
+                <a href="register.html">
+                    Create Account
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        // Prevent browser from restoring old form values
+        window.addEventListener(
+            "pageshow",
+            function(event) {
+
+                if (event.persisted) {
+
+                    document.getElementById(
+                        "email"
+                    ).value = "";
+
+                    document.getElementById(
+                        "password"
+                    ).value = "";
+
+                    document.getElementById(
+                        "role"
+                    ).value = "";
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

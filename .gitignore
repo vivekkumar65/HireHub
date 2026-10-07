@@ -1,0 +1,15 @@
+# Java compiled files
+*.class
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Old libraries
+lib_old
+
+# Local/server files
+*.log
+*.jar

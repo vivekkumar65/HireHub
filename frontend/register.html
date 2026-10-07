@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - Online Job Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#jobs">Jobs</a>
+            <a href="index.html#about">About</a>
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn"
+                    onclick="window.location.href='login.html'">
+                Login
+            </button>
+
+            <button class="register-btn">
+                Register
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Register Section -->
+    <section class="login-section">
+
+        <div class="login-card">
+
+            <div class="login-header">
+
+                <div class="login-icon">
+                    📝
+                </div>
+
+                <h1>Create Account</h1>
+
+                <p>
+                    Join Online Job Portal today
+                </p>
+
+            </div>
+
+
+            <!-- Register Form -->
+            <form action="/HireHub/register"
+                  method="POST"
+                  onsubmit="return checkPassword()">
+
+                <!-- Name -->
+                <div class="input-group">
+
+                    <label for="name">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Email -->
+                <div class="input-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="input-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Confirm your password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Role -->
+                <div class="input-group">
+
+                    <label for="role">
+                        Register As
+                    </label>
+
+                    <select id="role"
+                            name="role"
+                            required>
+
+                        <option value="">
+                            Select your role
+                        </option>
+
+                        <option value="job seeker">
+                            Job Seeker
+                        </option>
+
+                        <option value="recruiter">
+                            Recruiter
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Register Button -->
+                <button
+                    type="submit"
+                    class="main-login-btn">
+
+                    Create Account
+
+                </button>
+
+            </form>
+
+
+            <div class="register-text">
+
+                Already have an account?
+
+                <a href="login.html">
+                    Login Here
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        function checkPassword() {
+
+            let password =
+                document.getElementById("password").value;
+
+            let confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+
+            if (password !== confirmPassword) {
+
+                alert("Passwords do not match!");
+
+                return false;
+            }
+
+            return true;
+        }
+
+    </script>
+
+</body>
+
+</html>

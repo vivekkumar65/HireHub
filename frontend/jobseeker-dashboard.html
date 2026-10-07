@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Job Seeker Dashboard - Online Job Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="jobs.html">
+                Jobs
+            </a>
+
+            <a href="/HireHub/myApplications">
+                Applications
+            </a>
+
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="login-btn">
+                👤 <span id="userName">User</span>
+            </button>
+
+            <button
+                class="register-btn"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <section class="dashboard-header">
+
+        <div>
+
+            <p class="welcome">
+                JOB SEEKER DASHBOARD
+            </p>
+
+            <h1>
+                Welcome back,
+                <span id="welcomeName">User</span>! 👋
+            </h1>
+
+            <p>
+                Find your next opportunity and manage your applications.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="dashboard-section">
+
+        <div class="dashboard-cards">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    💼
+                </div>
+
+                <h2>
+                    Available Jobs
+                </h2>
+
+                <p>
+                    Explore the latest job opportunities.
+                </p>
+
+                <button onclick="showJobs()">
+                    View Jobs
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    🔍
+                </div>
+
+                <h2>
+                    Search Jobs
+                </h2>
+
+                <p>
+                    Search jobs by title, skill or company.
+                </p>
+
+                <button onclick="searchJobs()">
+                    Search Now
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    📋
+                </div>
+
+                <h2>
+                    My Applications
+                </h2>
+
+                <p>
+                    Track the status of your job applications.
+                </p>
+
+                <button onclick="viewApplications()">
+                    View Applications
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    👤
+                </div>
+
+                <h2>
+                    My Profile
+                </h2>
+
+                <p>
+                    View and manage your profile information.
+                </p>
+
+                <button onclick="viewProfile()">
+                    View Profile
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="quick-actions"
+            id="applications">
+
+            <h2>
+                Quick Actions
+            </h2>
+
+            <div class="action-buttons">
+
+                <button onclick="showJobs()">
+                    💼 Browse Jobs
+                </button>
+
+                <button onclick="viewApplications()">
+                    📋 My Applications
+                </button>
+
+                <button onclick="viewProfile()">
+                    👤 My Profile
+                </button>
+
+                <button onclick="changePassword()">
+                    🔑 Change Password
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <div class="logo">
+            Online<span>JobPortal</span>
+        </div>
+
+        <p>
+            © 2026 Online Job Portal. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        // ==================================================
+        // CHECK LOGIN SESSION
+        // ==================================================
+
+        function checkLogin() {
+
+            fetch("/HireHub/profile", {
+                method: "GET",
+                cache: "no-store"
+            })
+
+            .then(function(response) {
+
+                if (!response.ok) {
+                    throw new Error("Not logged in");
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(user) {
+
+                if (!user || !user.name) {
+
+                    window.location.replace(
+                        "/HireHub/login.html"
+                    );
+
+                    return;
+                }
+
+                document.getElementById(
+                    "userName"
+                ).innerText = user.name;
+
+                document.getElementById(
+                    "welcomeName"
+                ).innerText = user.name;
+
+            })
+
+            .catch(function() {
+
+                window.location.replace(
+                    "/HireHub/login.html"
+                );
+
+            });
+        }
+
+
+        // ==================================================
+        // CHECK SESSION WHEN PAGE OPENS
+        // ==================================================
+
+        checkLogin();
+
+
+        // ==================================================
+        // CHECK SESSION WHEN BACK BUTTON IS USED
+        // ==================================================
+
+        window.addEventListener(
+            "pageshow",
+            function() {
+
+                checkLogin();
+
+            }
+        );
+
+
+        // ==================================================
+        // VIEW JOBS
+        // ==================================================
+
+        function showJobs() {
+
+            window.location.href =
+                "jobs.html";
+
+        }
+
+
+        // ==================================================
+        // SEARCH JOBS
+        // ==================================================
+
+        function searchJobs() {
+
+            window.location.href =
+                "jobs.html";
+
+        }
+
+
+        // ==================================================
+        // MY APPLICATIONS
+        // ==================================================
+
+        function viewApplications() {
+
+            window.location.href =
+                "my-applications.html";
+
+        }
+
+
+        // ==================================================
+        // MY PROFILE
+        // ==================================================
+
+        function viewProfile() {
+
+            window.location.href =
+                "profile.html";
+
+        }
+
+
+        // ==================================================
+        // CHANGE PASSWORD
+        // ==================================================
+
+        function changePassword() {
+
+            window.location.href =
+                "change-password.html";
+
+        }
+
+
+        // ==================================================
+        // LOGOUT
+        // ==================================================
+
+        function logout() {
+
+            window.location.href =
+                "/HireHub/logout";
+
+        }
+
+    </script>
+
+</body>
+
+</html>

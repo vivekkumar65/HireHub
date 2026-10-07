@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate">
+
+    <meta http-equiv="Pragma"
+          content="no-cache">
+
+    <meta http-equiv="Expires"
+          content="0">
+
+    <title>Edit Job - HireHub</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8fafc;
+            color: #111827;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            height: 72px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .logo span {
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .role-btn {
+            border: 1px solid #dbeafe;
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 10px 16px;
+            border-radius: 9px;
+            font-weight: 600;
+        }
+
+        .dashboard-btn {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 10px 17px;
+            border-radius: 9px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dashboard-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* HEADER */
+
+        .page-header {
+            background: linear-gradient(
+                135deg,
+                #eff6ff,
+                #f8fafc
+            );
+
+            padding: 55px 20px 45px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .page-header .icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            border-radius: 16px;
+            background: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        /* FORM AREA */
+
+        .form-wrapper {
+            max-width: 850px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 18px;
+            padding: 38px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-title {
+            margin-bottom: 28px;
+        }
+
+        .form-title h2 {
+            font-size: 22px;
+            margin-bottom: 7px;
+        }
+
+        .form-title p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s;
+            background: #ffffff;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px #dbeafe;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .skills-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        /* BUTTONS */
+
+        .button-area {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .update-btn {
+            flex: 1;
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .update-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .cancel-btn {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            background: #f3f4f6;
+            color: #374151;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .cancel-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* LOADING */
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            display: none;
+        }
+
+        /* FOOTER */
+
+        footer {
+            margin-top: 70px;
+            background: #111827;
+            color: #9ca3af;
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        footer .logo {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        footer .logo span {
+            color: #60a5fa;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+        }
+
+        @media (max-width: 550px) {
+
+            .navbar {
+                height: auto;
+                padding: 15px 20px;
+            }
+
+            .nav-buttons {
+                gap: 5px;
+            }
+
+            .role-btn {
+                display: none;
+            }
+
+            .dashboard-btn {
+                padding: 9px 12px;
+                font-size: 13px;
+            }
+
+            .form-card {
+                padding: 25px 18px;
+            }
+
+            .button-area {
+                flex-direction: column;
+            }
+
+            .page-header {
+                padding: 40px 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        Hire<span>Hub</span>
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="recruiter-dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="my-jobs.html">
+            My Jobs
+        </a>
+
+        <a href="jobs.html">
+            Browse Jobs
+        </a>
+
+        <a href="profile.html">
+            My Profile
+        </a>
+
+    </div>
+
+
+    <div class="nav-buttons">
+
+        <div class="role-btn">
+            🏢 Recruiter
+        </div>
+
+        <button
+            class="dashboard-btn"
+            onclick="window.location.href='recruiter-dashboard.html'">
+
+            Dashboard
+
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- PAGE HEADER -->
+
+<section class="page-header">
+
+    <div class="icon">
+        ✏️
+    </div>
+
+    <h1>
+        Edit Job
+    </h1>
+
+    <p>
+        Update your job posting information
+        and keep it up to date.
+    </p>
+
+</section>
+
+
+<!-- FORM -->
+
+<section class="form-wrapper">
+
+    <div class="form-card">
+
+        <div class="form-title">
+
+            <h2>
+                Job Information
+            </h2>
+
+            <p>
+                Update the details below and save your changes.
+            </p>
+
+        </div>
+
+
+        <div
+            class="loading"
+            id="loading">
+
+            Loading job details...
+
+        </div>
+
+
+        <form
+            action="/HireHub/editJob"
+            method="POST"
+            id="editJobForm">
+
+
+            <input
+                type="hidden"
+                name="jobId"
+                id="jobId"
+            >
+
+
+            <div class="form-grid">
+
+
+                <!-- JOB TITLE -->
+
+                <div class="form-group full-width">
+
+                    <label for="title">
+                        Job Title
+                    </label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        placeholder="e.g. Senior Java Developer"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- COMPANY -->
+
+                <div class="form-group">
+
+                    <label for="company">
+                        Company
+                    </label>
+
+                    <input
+                        type="text"
+                        name="company"
+                        id="company"
+                        placeholder="Company name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="location">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        name="location"
+                        id="location"
+                        placeholder="e.g. Noida"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- SALARY -->
+
+                <div class="form-group">
+
+                    <label for="salary">
+                        Salary
+                    </label>
+
+                    <input
+                        type="text"
+                        name="salary"
+                        id="salary"
+                        placeholder="e.g. 8 LPA"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- SKILLS -->
+
+                <div class="form-group">
+
+                    <label for="skills">
+                        Required Skills
+                    </label>
+
+                    <input
+                        type="text"
+                        name="skills"
+                        id="skills"
+                        placeholder="C++, DSA, STL"
+                        required
+                    >
+
+                    <span class="skills-hint">
+                        Separate multiple skills with commas.
+                    </span>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full-width">
+
+                    <label for="description">
+                        Job Description
+                    </label>
+
+                    <textarea
+                        name="description"
+                        id="description"
+                        placeholder="Describe the role, responsibilities and requirements..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="button-area">
+
+                <a
+                    href="my-jobs.html"
+                    class="cancel-btn">
+
+                    Cancel
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="update-btn">
+
+                    ✓ Update Job
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <div class="logo">
+        Hire<span>Hub</span>
+    </div>
+
+    <p>
+        © 2026 HireHub. All Rights Reserved.
+    </p>
+
+</footer>
+
+
+<script>
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const jobId =
+        params.get("jobId");
+
+
+    if (!jobId) {
+
+        alert("Job ID is missing!");
+
+        window.location.href =
+            "my-jobs.html";
+
+    }
+
+
+    document.getElementById("jobId").value =
+        jobId;
+
+
+    const loading =
+        document.getElementById("loading");
+
+
+    loading.style.display =
+        "block";
+
+
+    fetch(
+        "/HireHub/jobDetails?jobId=" +
+        encodeURIComponent(jobId),
+        {
+            cache: "no-store"
+        }
+    )
+
+    .then(function(response) {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load job details."
+            );
+
+        }
+
+        return response.json();
+
+    })
+
+    .then(function(data) {
+
+        loading.style.display =
+            "none";
+
+
+        if (data.error) {
+
+            alert(data.error);
+
+            window.location.href =
+                "my-jobs.html";
+
+            return;
+
+        }
+
+
+        document.getElementById("title").value =
+            data.title || "";
+
+
+        document.getElementById("company").value =
+            data.company || "";
+
+
+        document.getElementById("location").value =
+            data.location || "";
+
+
+        document.getElementById("salary").value =
+            data.salary || "";
+
+
+        document.getElementById("skills").value =
+            data.skills || "";
+
+
+        document.getElementById("description").value =
+            data.description || "";
+
+    })
+
+    .catch(function(error) {
+
+        console.error(error);
+
+        loading.style.display =
+            "none";
+
+        alert(
+            "Unable to load job details."
+        );
+
+        window.location.href =
+            "my-jobs.html";
+
+    });
+
+
+</script>
+
+
+</body>
+
+</html>
