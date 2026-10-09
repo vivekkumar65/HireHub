@@ -28,32 +28,21 @@ public class MyJobsServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null ||
-                session.getAttribute("userId") == null) {
-
+        if (session == null || session.getAttribute("userId") == null) {
             response.sendRedirect("/HireHub/login.html");
             return;
         }
 
         String role = (String) session.getAttribute("userRole");
 
-        if (role == null ||
-                !"Recruiter".equalsIgnoreCase(role)) {
-
-            showError(
-                    response,
-                    "Access Denied",
-                    "Only recruiters can view their posted jobs.",
-                    "/HireHub/jobseeker-dashboard.html",
-                    "Back to Dashboard"
-            );
+        if (role == null || !"Recruiter".equalsIgnoreCase(role)) {
+            out.println("<p style='text-align:center;'>Access Denied</p>");
             return;
         }
 
         Object userIdObject = session.getAttribute("userId");
 
         if (!(userIdObject instanceof Integer)) {
-
             response.sendRedirect("/HireHub/login.html");
             return;
         }
@@ -67,289 +56,150 @@ public class MyJobsServlet extends HttpServlet {
                 "ORDER BY job_id DESC";
 
         out.println("""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>My Jobs - HireHub</title>
+                <style>
+                    .jobs-grid {
+                        width: 100%;
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                        gap: 22px;
+                    }
 
-                    <style>
-                        * {
-                            box-sizing: border-box;
-                            margin: 0;
-                            padding: 0;
-                            font-family: Arial, sans-serif;
-                        }
+                    .my-job-card {
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 14px;
+                        padding: 24px;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+                    }
 
-                        body {
-                            background: #f5f7fb;
-                            color: #1f2937;
-                            min-height: 100vh;
-                        }
+                    .my-job-card-top {
+                        display: flex;
+                        gap: 14px;
+                        align-items: center;
+                        margin-bottom: 18px;
+                    }
 
-                        .navbar {
-                            background: #111827;
-                            color: white;
-                            padding: 16px 7%;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            gap: 20px;
-                        }
+                    .my-job-icon {
+                        width: 48px;
+                        height: 48px;
+                        background: #eff6ff;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 23px;
+                    }
 
-                        .logo {
-                            font-size: 25px;
-                            font-weight: bold;
-                        }
+                    .my-job-card h2 {
+                        font-size: 20px;
+                        color: #111827;
+                        margin-bottom: 5px;
+                    }
 
-                        .nav-links {
-                            display: flex;
-                            gap: 20px;
-                            align-items: center;
-                            flex-wrap: wrap;
-                        }
+                    .my-job-company {
+                        color: #64748b;
+                        font-size: 14px;
+                    }
 
-                        .nav-links a {
-                            color: white;
-                            text-decoration: none;
-                            font-size: 14px;
-                        }
+                    .my-job-info {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        margin-bottom: 16px;
+                    }
 
-                        .nav-links a:hover {
-                            color: #60a5fa;
-                        }
+                    .my-job-info span {
+                        background: #f3f4f6;
+                        padding: 7px 9px;
+                        border-radius: 6px;
+                        font-size: 13px;
+                        color: #475569;
+                    }
 
-                        .container {
-                            width: 90%;
-                            max-width: 1100px;
-                            margin: 45px auto;
-                        }
+                    .my-job-skills {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 7px;
+                        margin-bottom: 18px;
+                    }
 
-                        .header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            gap: 20px;
-                            margin-bottom: 30px;
-                            flex-wrap: wrap;
-                        }
+                    .my-job-skills span {
+                        background: #eff6ff;
+                        color: #2563eb;
+                        padding: 6px 9px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                    }
 
-                        .header h1 {
-                            font-size: 32px;
-                            color: #111827;
-                            margin-bottom: 7px;
-                        }
+                    .my-job-actions {
+                        display: flex;
+                        gap: 8px;
+                        flex-wrap: wrap;
+                        border-top: 1px solid #e5e7eb;
+                        padding-top: 16px;
+                    }
 
-                        .header p {
-                            color: #6b7280;
-                        }
+                    .my-job-actions a,
+                    .my-job-actions button {
+                        border: none;
+                        border-radius: 7px;
+                        padding: 9px 12px;
+                        font-size: 13px;
+                        cursor: pointer;
+                        text-decoration: none;
+                        font-weight: 600;
+                    }
 
-                        .post-btn {
-                            background: #2563eb;
-                            color: white;
-                            padding: 12px 20px;
-                            border-radius: 8px;
-                            text-decoration: none;
-                            font-weight: bold;
-                        }
+                    .my-view-btn {
+                        background: #eff6ff;
+                        color: #2563eb;
+                    }
 
-                        .post-btn:hover {
-                            background: #1d4ed8;
-                        }
+                    .my-edit-btn {
+                        background: #fef3c7;
+                        color: #92400e;
+                    }
 
+                    .my-delete-btn {
+                        background: #fee2e2;
+                        color: #dc2626;
+                    }
+
+                    .my-job-actions form {
+                        margin: 0;
+                    }
+
+                    .my-jobs-empty {
+                        grid-column: 1 / -1;
+                        background: white;
+                        border-radius: 14px;
+                        padding: 55px 25px;
+                        text-align: center;
+                        border: 1px solid #e2e8f0;
+                    }
+
+                    .my-jobs-empty-icon {
+                        font-size: 45px;
+                        margin-bottom: 15px;
+                    }
+
+                    .my-jobs-empty h2 {
+                        margin-bottom: 8px;
+                    }
+
+                    .my-jobs-empty p {
+                        color: #64748b;
+                        margin-bottom: 20px;
+                    }
+
+                    @media (max-width: 600px) {
                         .jobs-grid {
-                            display: grid;
-                            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-                            gap: 22px;
+                            grid-template-columns: 1fr;
                         }
+                    }
+                </style>
 
-                        .job-card {
-                            background: white;
-                            border-radius: 14px;
-                            padding: 24px;
-                            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
-                            border: 1px solid #e5e7eb;
-                        }
-
-                        .job-card-top {
-                            display: flex;
-                            gap: 14px;
-                            align-items: center;
-                            margin-bottom: 20px;
-                        }
-
-                        .company-icon {
-                            width: 48px;
-                            height: 48px;
-                            background: #eff6ff;
-                            border-radius: 10px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            font-size: 24px;
-                        }
-
-                        .job-card h2 {
-                            font-size: 20px;
-                            color: #111827;
-                            margin-bottom: 5px;
-                        }
-
-                        .company {
-                            color: #6b7280;
-                            font-size: 14px;
-                        }
-
-                        .job-info {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 10px;
-                            margin-bottom: 18px;
-                        }
-
-                        .job-info span {
-                            background: #f3f4f6;
-                            padding: 7px 10px;
-                            border-radius: 6px;
-                            font-size: 13px;
-                            color: #4b5563;
-                        }
-
-                        .job-skills {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 7px;
-                            margin-bottom: 20px;
-                        }
-
-                        .job-skills span {
-                            background: #eff6ff;
-                            color: #2563eb;
-                            padding: 6px 9px;
-                            border-radius: 6px;
-                            font-size: 12px;
-                        }
-
-                        .actions {
-                            display: flex;
-                            gap: 8px;
-                            flex-wrap: wrap;
-                            border-top: 1px solid #e5e7eb;
-                            padding-top: 18px;
-                        }
-
-                        .actions a,
-                        .actions button {
-                            border: none;
-                            border-radius: 7px;
-                            padding: 9px 12px;
-                            font-size: 13px;
-                            cursor: pointer;
-                            text-decoration: none;
-                            font-weight: 600;
-                        }
-
-                        .view-btn {
-                            background: #eff6ff;
-                            color: #2563eb;
-                        }
-
-                        .edit-btn {
-                            background: #fef3c7;
-                            color: #92400e;
-                        }
-
-                        .delete-btn {
-                            background: #fee2e2;
-                            color: #dc2626;
-                        }
-
-                        .actions form {
-                            margin: 0;
-                        }
-
-                        .empty {
-                            background: white;
-                            border-radius: 14px;
-                            padding: 55px 25px;
-                            text-align: center;
-                            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-                        }
-
-                        .empty-icon {
-                            font-size: 48px;
-                            margin-bottom: 15px;
-                        }
-
-                        .empty h2 {
-                            margin-bottom: 8px;
-                            color: #111827;
-                        }
-
-                        .empty p {
-                            color: #6b7280;
-                            margin-bottom: 22px;
-                        }
-
-                        .footer {
-                            text-align: center;
-                            color: #9ca3af;
-                            padding: 30px 15px;
-                            font-size: 13px;
-                        }
-
-                        @media (max-width: 600px) {
-                            .navbar {
-                                flex-direction: column;
-                                align-items: flex-start;
-                            }
-
-                            .container {
-                                width: 94%;
-                                margin: 30px auto;
-                            }
-
-                            .header h1 {
-                                font-size: 27px;
-                            }
-
-                            .post-btn {
-                                width: 100%;
-                                text-align: center;
-                            }
-                        }
-                    </style>
-                </head>
-
-                <body>
-
-                <nav class="navbar">
-                    <div class="logo">HireHub</div>
-
-                    <div class="nav-links">
-                        <a href="/HireHub/recruiter-dashboard.html">Dashboard</a>
-                        <a href="/HireHub/jobs.html">Jobs</a>
-                        <a href="/HireHub/view-applicants.html">Applicants</a>
-                        <a href="/HireHub/profile.html">Profile</a>
-                    </div>
-                </nav>
-
-                <main class="container">
-
-                    <div class="header">
-                        <div>
-                            <h1>My Jobs</h1>
-                            <p>Manage the jobs you have posted on HireHub.</p>
-                        </div>
-
-                        <a class="post-btn"
-                           href="/HireHub/post-job.html">
-                            + Post New Job
-                        </a>
-                    </div>
-
-                    <div class="jobs-grid">
+                <div class="jobs-grid">
                 """);
 
         try (
@@ -368,18 +218,17 @@ public class MyJobsServlet extends HttpServlet {
                     found = true;
 
                     int jobId = rs.getInt("job_id");
-
                     String title = rs.getString("title");
                     String company = rs.getString("company");
                     String location = rs.getString("location");
                     String salary = rs.getString("salary");
                     String skills = rs.getString("skills");
 
-                    out.println("<div class='job-card'>");
+                    out.println("<div class='my-job-card'>");
 
                     out.println("""
-                            <div class="job-card-top">
-                                <div class="company-icon">💼</div>
+                            <div class="my-job-card-top">
+                                <div class="my-job-icon">💼</div>
                                 <div>
                             """);
 
@@ -390,7 +239,7 @@ public class MyJobsServlet extends HttpServlet {
                     );
 
                     out.println(
-                            "<p class='company'>" +
+                            "<p class='my-job-company'>" +
                             escapeHtml(company) +
                             "</p>"
                     );
@@ -400,7 +249,7 @@ public class MyJobsServlet extends HttpServlet {
                             </div>
                             """);
 
-                    out.println("<div class='job-info'>");
+                    out.println("<div class='my-job-info'>");
 
                     out.println(
                             "<span>📍 " +
@@ -414,13 +263,11 @@ public class MyJobsServlet extends HttpServlet {
                             "</span>"
                     );
 
-                    out.println(
-                            "<span>💼 Full Time</span>"
-                    );
+                    out.println("<span>💼 Full Time</span>");
 
                     out.println("</div>");
 
-                    out.println("<div class='job-skills'>");
+                    out.println("<div class='my-job-skills'>");
 
                     if (skills != null && !skills.trim().isEmpty()) {
 
@@ -431,7 +278,6 @@ public class MyJobsServlet extends HttpServlet {
                             String cleanSkill = skill.trim();
 
                             if (!cleanSkill.isEmpty()) {
-
                                 out.println(
                                         "<span>" +
                                         escapeHtml(cleanSkill) +
@@ -443,24 +289,25 @@ public class MyJobsServlet extends HttpServlet {
 
                     out.println("</div>");
 
-                    out.println("""
-                            <div class="actions">
-                            """);
+                    out.println("<div class='my-job-actions'>");
 
                     out.println(
-                            "<a class='view-btn' href='/HireHub/job-details.html?jobId=" +
+                            "<a class='my-view-btn' " +
+                            "href='/HireHub/job-details.html?jobId=" +
                             jobId +
                             "'>👁️ View Details</a>"
                     );
 
                     out.println(
-                            "<a class='edit-btn' href='/HireHub/edit-job.html?jobId=" +
+                            "<a class='my-edit-btn' " +
+                            "href='/HireHub/edit-job.html?jobId=" +
                             jobId +
                             "'>✏️ Edit Job</a>"
                     );
 
                     out.println(
-                            "<form method='POST' action='/HireHub/deleteJob' " +
+                            "<form method='POST' " +
+                            "action='/HireHub/deleteJob' " +
                             "onsubmit=\"return confirm('Are you sure you want to delete this job?');\">"
                     );
 
@@ -471,7 +318,7 @@ public class MyJobsServlet extends HttpServlet {
                     );
 
                     out.println(
-                            "<button class='delete-btn' type='submit'>" +
+                            "<button class='my-delete-btn' type='submit'>" +
                             "🗑️ Delete Job" +
                             "</button>"
                     );
@@ -482,23 +329,20 @@ public class MyJobsServlet extends HttpServlet {
                     out.println("</div>");
                 }
 
-                out.println("</div>");
-
                 if (!found) {
 
                     out.println("""
-                            <div class="empty">
-                                <div class="empty-icon">📋</div>
+                            <div class="my-jobs-empty">
+                                <div class="my-jobs-empty-icon">📋</div>
                                 <h2>No Jobs Posted Yet</h2>
                                 <p>You haven't posted any jobs yet.</p>
-                                <a class="post-btn"
+                                <a class="register-btn"
                                    href="/HireHub/post-job.html">
                                     Post Your First Job
                                 </a>
                             </div>
                             """);
                 }
-
             }
 
         } catch (Exception e) {
@@ -509,135 +353,15 @@ public class MyJobsServlet extends HttpServlet {
             );
 
             out.println("""
-                    </div>
-
-                    <div class="empty">
-                        <div class="empty-icon">⚠️</div>
+                    <div class="my-jobs-empty">
+                        <div class="my-jobs-empty-icon">⚠️</div>
                         <h2>Unable to Load Jobs</h2>
                         <p>Something went wrong while loading your posted jobs.</p>
-
-                        <a class="post-btn"
-                           href="/HireHub/recruiter-dashboard.html">
-                            Back to Dashboard
-                        </a>
                     </div>
                     """);
         }
 
-        out.println("""
-                </main>
-
-                <footer class="footer">
-                    © 2026 HireHub. All rights reserved.
-                </footer>
-
-                </body>
-                </html>
-                """);
-    }
-
-    private void showError(
-            HttpServletResponse response,
-            String title,
-            String message,
-            String buttonLink,
-            String buttonText)
-            throws IOException {
-
-        response.setContentType("text/html;charset=UTF-8");
-
-        PrintWriter out = response.getWriter();
-
-        out.println("""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>HireHub</title>
-
-                    <style>
-                        * {
-                            box-sizing: border-box;
-                            font-family: Arial, sans-serif;
-                        }
-
-                        body {
-                            margin: 0;
-                            background: #f5f7fb;
-                            min-height: 100vh;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                        }
-
-                        .card {
-                            width: 90%;
-                            max-width: 500px;
-                            background: white;
-                            padding: 40px;
-                            border-radius: 16px;
-                            text-align: center;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-                        }
-
-                        .icon {
-                            font-size: 50px;
-                            margin-bottom: 15px;
-                        }
-
-                        h1 {
-                            color: #111827;
-                            margin-bottom: 10px;
-                        }
-
-                        p {
-                            color: #6b7280;
-                            margin-bottom: 25px;
-                        }
-
-                        a {
-                            display: inline-block;
-                            background: #2563eb;
-                            color: white;
-                            text-decoration: none;
-                            padding: 12px 22px;
-                            border-radius: 8px;
-                            font-weight: bold;
-                        }
-                    </style>
-                </head>
-
-                <body>
-                    <div class="card">
-                        <div class="icon">⚠️</div>
-                """);
-
-        out.println(
-                "<h1>" +
-                escapeHtml(title) +
-                "</h1>"
-        );
-
-        out.println(
-                "<p>" +
-                escapeHtml(message) +
-                "</p>"
-        );
-
-        out.println(
-                "<a href='" +
-                escapeHtml(buttonLink) +
-                "'>" +
-                escapeHtml(buttonText) +
-                "</a>"
-        );
-
-        out.println("""
-                    </div>
-                </body>
-                </html>
-                """);
+        out.println("</div>");
     }
 
     private String escapeHtml(String value) {
