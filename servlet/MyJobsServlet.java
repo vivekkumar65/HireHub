@@ -36,7 +36,11 @@ public class MyJobsServlet extends HttpServlet {
         String role = (String) session.getAttribute("userRole");
 
         if (role == null || !"Recruiter".equalsIgnoreCase(role)) {
-            out.println("<p style='text-align:center;'>Access Denied</p>");
+            out.println(
+                    "<p style='text-align:center;'>" +
+                    "Access Denied" +
+                    "</p>"
+            );
             return;
         }
 
@@ -55,169 +59,6 @@ public class MyJobsServlet extends HttpServlet {
                 "WHERE recruiter_id = ? " +
                 "ORDER BY job_id DESC";
 
-        out.println("""
-                <style>
-
-                    .jobs-grid {
-                        width: 100%;
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                        gap: 22px;
-                    }
-
-                    .job-card {
-                        background: white;
-                        border: 1px solid #e2e8f0;
-                        border-radius: 14px;
-                        padding: 24px;
-                        box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-                    }
-
-                    .job-card-top {
-                        display: flex;
-                        gap: 14px;
-                        align-items: center;
-                        margin-bottom: 18px;
-                    }
-
-                    .company-icon {
-                        width: 48px;
-                        height: 48px;
-                        background: #eff6ff;
-                        border-radius: 10px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 23px;
-                    }
-
-                    .job-card h2 {
-                        font-size: 20px;
-                        color: #111827;
-                        margin: 0 0 5px 0;
-                    }
-
-                    .job-card-top p {
-                        color: #64748b;
-                        font-size: 14px;
-                        margin: 0;
-                    }
-
-                    .job-info {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 8px;
-                        margin-bottom: 16px;
-                    }
-
-                    .job-info span {
-                        background: #f3f4f6;
-                        padding: 7px 9px;
-                        border-radius: 6px;
-                        font-size: 13px;
-                        color: #475569;
-                    }
-
-                    .job-skills {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 7px;
-                        margin-bottom: 18px;
-                    }
-
-                    .job-skills span {
-                        background: #eff6ff;
-                        color: #2563eb;
-                        padding: 6px 9px;
-                        border-radius: 6px;
-                        font-size: 12px;
-                    }
-
-                    .my-job-actions {
-                        display: flex;
-                        gap: 8px;
-                        flex-wrap: wrap;
-                        border-top: 1px solid #e5e7eb;
-                        padding-top: 16px;
-                    }
-
-                    .my-job-actions a,
-                    .my-job-actions button {
-                        border: none;
-                        border-radius: 7px;
-                        padding: 9px 12px;
-                        font-size: 13px;
-                        cursor: pointer;
-                        text-decoration: none;
-                        font-weight: 600;
-                    }
-
-                    .view-details-btn {
-                        background: #2563eb;
-                        color: white;
-                    }
-
-                    .edit-job-btn {
-                        background: #fef3c7;
-                        color: #92400e;
-                    }
-
-                    .delete-job-btn {
-                        background: #fee2e2;
-                        color: #dc2626;
-                    }
-
-                    .my-job-actions form {
-                        margin: 0;
-                    }
-
-                    .my-jobs-empty {
-                        grid-column: 1 / -1;
-                        background: white;
-                        border-radius: 14px;
-                        padding: 55px 25px;
-                        text-align: center;
-                        border: 1px solid #e2e8f0;
-                    }
-
-                    .my-jobs-empty-icon {
-                        font-size: 45px;
-                        margin-bottom: 15px;
-                    }
-
-                    .my-jobs-empty h2 {
-                        margin-bottom: 8px;
-                    }
-
-                    .my-jobs-empty p {
-                        color: #64748b;
-                        margin-bottom: 20px;
-                        color: #64748b;
-                    }
-
-                    .post-first-job-btn {
-                        display: inline-block;
-                        background: #2563eb;
-                        color: white;
-                        padding: 11px 18px;
-                        border-radius: 8px;
-                        text-decoration: none;
-                        font-weight: 600;
-                    }
-
-                    @media (max-width: 600px) {
-
-                        .jobs-grid {
-                            grid-template-columns: 1fr;
-                        }
-
-                    }
-
-                </style>
-
-                <div class="jobs-grid">
-                """);
-
         try (
                 Connection con = DatabaseConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)
@@ -233,7 +74,8 @@ public class MyJobsServlet extends HttpServlet {
 
                     jobsFound = true;
 
-                    int jobId = rs.getInt("job_id");
+                    int jobId =
+                            rs.getInt("job_id");
 
                     String title =
                             rs.getString("title");
@@ -250,15 +92,17 @@ public class MyJobsServlet extends HttpServlet {
                     String skills =
                             rs.getString("skills");
 
+                    /*
+                     * Same job-card structure as JobsServlet
+                     */
+
                     out.println("<div class='job-card'>");
 
                     out.println("<div class='job-card-top'>");
 
-                    out.println("""
-                            <div class="company-icon">
-                                💼
-                            </div>
-                            """);
+                    out.println("<div class='company-icon'>");
+                    out.println("💼");
+                    out.println("</div>");
 
                     out.println("<div>");
 
@@ -324,11 +168,17 @@ public class MyJobsServlet extends HttpServlet {
 
                     out.println("</div>");
 
-                    out.println("<div class='my-job-actions'>");
+                    /*
+                     * Recruiter actions
+                     */
+
+                    out.println("""
+                            <div class="my-job-actions">
+                            """);
 
                     out.println(
                             "<a class='view-details-btn' " +
-                            "href='/HireHub/job-details.html?jobId=" +
+                            "href='job-details.html?jobId=" +
                             jobId +
                             "'>" +
                             "View Details" +
@@ -337,7 +187,7 @@ public class MyJobsServlet extends HttpServlet {
 
                     out.println(
                             "<a class='edit-job-btn' " +
-                            "href='/HireHub/edit-job.html?jobId=" +
+                            "href='edit-job.html?jobId=" +
                             jobId +
                             "'>" +
                             "✏️ Edit Job" +
@@ -347,7 +197,8 @@ public class MyJobsServlet extends HttpServlet {
                     out.println(
                             "<form method='POST' " +
                             "action='/HireHub/deleteJob' " +
-                            "onsubmit=\"return confirm('Are you sure you want to delete this job?');\">"
+                            "onsubmit=\"return confirm('Are you sure you want to delete this job?');\" " +
+                            "style='display:inline; margin:0;'>"
                     );
 
                     out.println(
@@ -359,7 +210,8 @@ public class MyJobsServlet extends HttpServlet {
                     );
 
                     out.println(
-                            "<button class='delete-job-btn' " +
+                            "<button " +
+                            "class='delete-job-btn' " +
                             "type='submit'>" +
                             "🗑️ Delete Job" +
                             "</button>"
@@ -374,55 +226,27 @@ public class MyJobsServlet extends HttpServlet {
 
                 if (!jobsFound) {
 
-                    out.println("""
-                            <div class="my-jobs-empty">
-
-                                <div class="my-jobs-empty-icon">
-                                    📋
-                                </div>
-
-                                <h2>No Jobs Posted Yet</h2>
-
-                                <p>
-                                    You haven't posted any jobs yet.
-                                </p>
-
-                                <a
-                                    class="post-first-job-btn"
-                                    href="/HireHub/post-job.html">
-                                    Post Your First Job
-                                </a>
-
-                            </div>
-                            """);
+                    out.println(
+                            "<p style='text-align:center;'>" +
+                            "You haven't posted any jobs yet." +
+                            "</p>"
+                    );
                 }
             }
 
         } catch (Exception e) {
 
-            System.err.println(
+            System.out.println(
                     "MyJobsServlet Error: " +
                     e.getMessage()
             );
 
-            out.println("""
-                    <div class="my-jobs-empty">
-
-                        <div class="my-jobs-empty-icon">
-                            ⚠️
-                        </div>
-
-                        <h2>Unable to Load Jobs</h2>
-
-                        <p>
-                            Something went wrong while loading your posted jobs.
-                        </p>
-
-                    </div>
-                    """);
+            out.println(
+                    "<p style='text-align:center;'>" +
+                    "Unable to load your jobs. Please try again later." +
+                    "</p>"
+            );
         }
-
-        out.println("</div>");
     }
 
     private String escapeHtml(String value) {
