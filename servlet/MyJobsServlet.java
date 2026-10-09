@@ -21,52 +21,83 @@ public class MyJobsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
-        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
+
+        response.setHeader(
+                "Cache-Control",
+                "no-store, no-cache, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
 
         PrintWriter out = response.getWriter();
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("/HireHub/login.html");
+        if (session == null ||
+            session.getAttribute("userId") == null) {
+
+            response.sendRedirect(
+                    "/HireHub/login.html"
+            );
+
             return;
         }
 
-        String role = (String) session.getAttribute("userRole");
+        String role =
+                (String) session.getAttribute("userRole");
 
-        if (role == null || !"Recruiter".equalsIgnoreCase(role)) {
+        if (role == null ||
+            !"Recruiter".equalsIgnoreCase(role)) {
+
             out.println(
                     "<p style='text-align:center;'>" +
                     "Access Denied" +
                     "</p>"
             );
+
             return;
         }
 
-        Object userIdObject = session.getAttribute("userId");
+        Object userIdObject =
+                session.getAttribute("userId");
 
         if (!(userIdObject instanceof Integer)) {
-            response.sendRedirect("/HireHub/login.html");
+
+            response.sendRedirect(
+                    "/HireHub/login.html"
+            );
+
             return;
         }
 
-        int recruiterId = (Integer) userIdObject;
+        int recruiterId =
+                (Integer) userIdObject;
 
         String sql =
-                "SELECT job_id, title, company, location, salary, skills " +
+                "SELECT job_id, title, company, location, " +
+                "salary, skills " +
                 "FROM jobs " +
                 "WHERE recruiter_id = ? " +
                 "ORDER BY job_id DESC";
 
         try (
-                Connection con = DatabaseConnection.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)
+                Connection con =
+                        DatabaseConnection.getConnection();
+
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
         ) {
 
             ps.setInt(1, recruiterId);
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
 
                 boolean jobsFound = false;
 
@@ -92,19 +123,33 @@ public class MyJobsServlet extends HttpServlet {
                     String skills =
                             rs.getString("skills");
 
+
                     /*
-                     * Same job-card structure as JobsServlet
+                     * SAME CARD STRUCTURE
+                     * AS JOBS PAGE
                      */
 
-                    out.println("<div class='job-card'>");
+                    out.println(
+                            "<div class='job-card'>"
+                    );
 
-                    out.println("<div class='job-card-top'>");
 
-                    out.println("<div class='company-icon'>");
+                    out.println(
+                            "<div class='job-card-top'>"
+                    );
+
+
+                    out.println(
+                            "<div class='company-icon'>"
+                    );
+
                     out.println("💼");
+
                     out.println("</div>");
 
+
                     out.println("<div>");
+
 
                     out.println(
                             "<h2>" +
@@ -112,17 +157,27 @@ public class MyJobsServlet extends HttpServlet {
                             "</h2>"
                     );
 
+
                     out.println(
                             "<p>" +
                             escapeHtml(company) +
                             "</p>"
                     );
 
-                    out.println("</div>");
 
                     out.println("</div>");
 
-                    out.println("<div class='job-info'>");
+                    out.println("</div>");
+
+
+                    /*
+                     * JOB INFORMATION
+                     */
+
+                    out.println(
+                            "<div class='job-info'>"
+                    );
+
 
                     out.println(
                             "<span>📍 " +
@@ -130,19 +185,30 @@ public class MyJobsServlet extends HttpServlet {
                             "</span>"
                     );
 
+
                     out.println(
                             "<span>💰 " +
                             escapeHtml(salary) +
                             "</span>"
                     );
 
+
                     out.println(
                             "<span>💼 Full Time</span>"
                     );
 
+
                     out.println("</div>");
 
-                    out.println("<div class='job-skills'>");
+
+                    /*
+                     * SKILLS
+                     */
+
+                    out.println(
+                            "<div class='job-skills'>"
+                    );
+
 
                     if (skills != null &&
                         !skills.trim().isEmpty()) {
@@ -150,79 +216,116 @@ public class MyJobsServlet extends HttpServlet {
                         String[] skillsArray =
                                 skills.split(",");
 
-                        for (String skill : skillsArray) {
+
+                        for (String skill :
+                                skillsArray) {
 
                             String cleanSkill =
                                     skill.trim();
+
 
                             if (!cleanSkill.isEmpty()) {
 
                                 out.println(
                                         "<span>" +
-                                        escapeHtml(cleanSkill) +
+                                        escapeHtml(
+                                                cleanSkill
+                                        ) +
                                         "</span>"
                                 );
                             }
                         }
                     }
 
+
                     out.println("</div>");
 
+
                     /*
-                     * Recruiter actions
+                     * RECRUITER ACTIONS
+                     *
+                     * ORIGINAL BUTTON COLORS
                      */
 
-                    out.println("""
-                            <div class="my-job-actions">
-                            """);
+                    out.println(
+                            "<div class='my-job-actions'>"
+                    );
+
+
+                    /*
+                     * VIEW DETAILS
+                     * ORIGINAL BLUE
+                     */
 
                     out.println(
-                            "<a class='view-details-btn' " +
-                            "href='job-details.html?jobId=" +
+                            "<a " +
+                            "class='my-view-btn' " +
+                            "href='/HireHub/job-details.html?jobId=" +
                             jobId +
                             "'>" +
                             "View Details" +
                             "</a>"
                     );
 
+
+                    /*
+                     * EDIT JOB
+                     * ORIGINAL YELLOW
+                     */
+
                     out.println(
-                            "<a class='edit-job-btn' " +
-                            "href='edit-job.html?jobId=" +
+                            "<a " +
+                            "class='my-edit-btn' " +
+                            "href='/HireHub/edit-job.html?jobId=" +
                             jobId +
                             "'>" +
                             "✏️ Edit Job" +
                             "</a>"
                     );
 
-                    out.println(
-                            "<form method='POST' " +
-                            "action='/HireHub/deleteJob' " +
-                            "onsubmit=\"return confirm('Are you sure you want to delete this job?');\" " +
-                            "style='display:inline; margin:0;'>"
-                    );
+
+                    /*
+                     * DELETE JOB
+                     * ORIGINAL LIGHT BLUE
+                     */
 
                     out.println(
-                            "<input type='hidden' " +
+                            "<form " +
+                            "method='POST' " +
+                            "action='/HireHub/deleteJob' " +
+                            "onsubmit=\"return confirm('Are you sure you want to delete this job?');\" " +
+                            "style='margin:0;'>"
+                    );
+
+
+                    out.println(
+                            "<input " +
+                            "type='hidden' " +
                             "name='jobId' " +
                             "value='" +
                             jobId +
                             "'>"
                     );
 
+
                     out.println(
                             "<button " +
-                            "class='delete-job-btn' " +
+                            "class='my-delete-btn' " +
                             "type='submit'>" +
                             "🗑️ Delete Job" +
                             "</button>"
                     );
 
+
                     out.println("</form>");
 
+
                     out.println("</div>");
+
 
                     out.println("</div>");
                 }
+
 
                 if (!jobsFound) {
 
@@ -241,13 +344,16 @@ public class MyJobsServlet extends HttpServlet {
                     e.getMessage()
             );
 
+
             out.println(
                     "<p style='text-align:center;'>" +
-                    "Unable to load your jobs. Please try again later." +
+                    "Unable to load your jobs. " +
+                    "Please try again later." +
                     "</p>"
             );
         }
     }
+
 
     private String escapeHtml(String value) {
 

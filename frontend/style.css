@@ -1183,3 +1183,39 @@ footer p {
     }
 
 }
+.my-job-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.my-job-actions a,
+.my-job-actions button {
+    border: none;
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.my-view-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.my-edit-btn {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.my-delete-btn {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.my-job-actions form {
+    margin: 0;
+}
