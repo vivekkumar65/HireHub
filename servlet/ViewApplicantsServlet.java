@@ -23,26 +23,45 @@ public class ViewApplicantsServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        response.setHeader(
+                "Cache-Control",
+                "no-store, no-cache, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
         PrintWriter out = response.getWriter();
 
         HttpSession session =
                 request.getSession(false);
 
         if (session == null ||
-            session.getAttribute("userId") == null) {
+                session.getAttribute("userId") == null) {
+
+            out.println("[]");
+            return;
+        }
+
+        Object userIdObject =
+                session.getAttribute("userId");
+
+        if (!(userIdObject instanceof Integer)) {
 
             out.println("[]");
             return;
         }
 
         int recruiterId =
-                (Integer) session.getAttribute("userId");
+                (Integer) userIdObject;
 
         String role =
                 (String) session.getAttribute("userRole");
 
         if (role == null ||
-            !role.equalsIgnoreCase("Recruiter")) {
+                !role.equalsIgnoreCase("Recruiter")) {
 
             out.println("[]");
             return;
@@ -76,103 +95,104 @@ public class ViewApplicantsServlet extends HttpServlet {
 
             ps.setInt(1, recruiterId);
 
-            ResultSet rs =
-                    ps.executeQuery();
+            try (ResultSet rs =
+                         ps.executeQuery()) {
 
-            out.println("[");
+                out.println("[");
 
-            boolean first = true;
+                boolean first = true;
 
-            while (rs.next()) {
+                while (rs.next()) {
 
-                if (!first) {
-                    out.println(",");
+                    if (!first) {
+                        out.println(",");
+                    }
+
+                    first = false;
+
+                    int applicationId =
+                            rs.getInt("application_id");
+
+                    int jobId =
+                            rs.getInt("job_id");
+
+                    String title =
+                            rs.getString("title");
+
+                    String company =
+                            rs.getString("company");
+
+                    String location =
+                            rs.getString("location");
+
+                    String name =
+                            rs.getString("name");
+
+                    String email =
+                            rs.getString("email");
+
+                    String status =
+                            rs.getString("status");
+
+                    out.println("{");
+
+                    out.println(
+                            "\"applicationId\":" +
+                            applicationId + ","
+                    );
+
+                    out.println(
+                            "\"jobId\":" +
+                            jobId + ","
+                    );
+
+                    out.println(
+                            "\"title\":\"" +
+                            escapeJson(title) +
+                            "\","
+                    );
+
+                    out.println(
+                            "\"company\":\"" +
+                            escapeJson(company) +
+                            "\","
+                    );
+
+                    out.println(
+                            "\"location\":\"" +
+                            escapeJson(location) +
+                            "\","
+                    );
+
+                    out.println(
+                            "\"name\":\"" +
+                            escapeJson(name) +
+                            "\","
+                    );
+
+                    out.println(
+                            "\"email\":\"" +
+                            escapeJson(email) +
+                            "\","
+                    );
+
+                    out.println(
+                            "\"status\":\"" +
+                            escapeJson(status) +
+                            "\""
+                    );
+
+                    out.println("}");
                 }
 
-                first = false;
-
-                int applicationId =
-                        rs.getInt("application_id");
-
-                int jobId =
-                        rs.getInt("job_id");
-
-                String title =
-                        rs.getString("title");
-
-                String company =
-                        rs.getString("company");
-
-                String location =
-                        rs.getString("location");
-
-                String name =
-                        rs.getString("name");
-
-                String email =
-                        rs.getString("email");
-
-                String status =
-                        rs.getString("status");
-
-                out.println("{");
-
-                out.println(
-                    "\"applicationId\":" +
-                    applicationId + ","
-                );
-
-                out.println(
-                    "\"jobId\":" +
-                    jobId + ","
-                );
-
-                out.println(
-                    "\"title\":\"" +
-                    escapeJson(title) +
-                    "\","
-                );
-
-                out.println(
-                    "\"company\":\"" +
-                    escapeJson(company) +
-                    "\","
-                );
-
-                out.println(
-                    "\"location\":\"" +
-                    escapeJson(location) +
-                    "\","
-                );
-
-                out.println(
-                    "\"name\":\"" +
-                    escapeJson(name) +
-                    "\","
-                );
-
-                out.println(
-                    "\"email\":\"" +
-                    escapeJson(email) +
-                    "\","
-                );
-
-                out.println(
-                    "\"status\":\"" +
-                    escapeJson(status) +
-                    "\""
-                );
-
-                out.println("}");
+                out.println("]");
             }
-
-            out.println("]");
 
         } catch (Exception e) {
 
-            System.out.println(
-                "ViewApplicantsServlet Error: "
-                + e.getMessage()
+            System.err.println(
+                    "ViewApplicantsServlet Error: " +
+                    e.getMessage()
             );
 
             out.println("[]");
@@ -188,7 +208,10 @@ public class ViewApplicantsServlet extends HttpServlet {
         return value
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
                 .replace("\n", "\\n")
-                .replace("\r", "\\r");
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }

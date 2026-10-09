@@ -39,8 +39,12 @@ public class PostJobServlet extends HttpServlet {
         if (role == null ||
             !role.equalsIgnoreCase("Recruiter")) {
 
-            response.getWriter().println(
-                    "<h1>Access Denied!</h1>"
+            showError(
+                    response,
+                    "Access Denied!",
+                    "Only recruiters can post jobs.",
+                    "/HireHub/recruiter-dashboard.html",
+                    "Back to Dashboard"
             );
 
             return;
@@ -67,13 +71,36 @@ public class PostJobServlet extends HttpServlet {
         String description =
                 request.getParameter("description");
 
+        if (title == null || title.trim().isEmpty() ||
+            company == null || company.trim().isEmpty() ||
+            location == null || location.trim().isEmpty() ||
+            salary == null || salary.trim().isEmpty() ||
+            skills == null || skills.trim().isEmpty() ||
+            description == null || description.trim().isEmpty()) {
+
+            showError(
+                    response,
+                    "Missing Information!",
+                    "Please fill in all job details before posting.",
+                    "/HireHub/post-job.html",
+                    "Back to Post Job"
+            );
+
+            return;
+        }
+
+        title = title.trim();
+        company = company.trim();
+        location = location.trim();
+        salary = salary.trim();
+        skills = skills.trim();
+        description = description.trim();
 
         String sql =
                 "INSERT INTO jobs " +
                 "(title, company, location, salary, " +
                 "skills, description, recruiter_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
 
         try (
                 Connection con =
@@ -94,262 +121,265 @@ public class PostJobServlet extends HttpServlet {
             int rows =
                     ps.executeUpdate();
 
-
             if (rows > 0) {
 
-                response.getWriter().println(
-                        "<!DOCTYPE html>"
+                showSuccess(
+                        response,
+                        title
                 );
-
-                response.getWriter().println(
-                        "<html lang='en'>"
-                );
-
-                response.getWriter().println(
-                        "<head>"
-                );
-
-                response.getWriter().println(
-                        "<meta charset='UTF-8'>"
-                );
-
-                response.getWriter().println(
-                        "<meta name='viewport' " +
-                        "content='width=device-width, initial-scale=1.0'>"
-                );
-
-                response.getWriter().println(
-                        "<title>Job Posted - HireHub</title>"
-                );
-
-                response.getWriter().println(
-
-                        "<style>" +
-
-                        "*{" +
-                        "box-sizing:border-box;" +
-                        "margin:0;" +
-                        "padding:0;" +
-                        "}" +
-
-                        "body{" +
-                        "font-family:Arial,Helvetica,sans-serif;" +
-                        "background:linear-gradient(135deg,#eef2ff,#f8fafc);" +
-                        "min-height:100vh;" +
-                        "display:flex;" +
-                        "align-items:center;" +
-                        "justify-content:center;" +
-                        "padding:20px;" +
-                        "}" +
-
-                        ".card{" +
-                        "width:100%;" +
-                        "max-width:520px;" +
-                        "background:white;" +
-                        "border-radius:20px;" +
-                        "padding:45px 35px;" +
-                        "text-align:center;" +
-                        "box-shadow:0 15px 40px rgba(0,0,0,0.12);" +
-                        "}" +
-
-                        ".success-icon{" +
-                        "width:85px;" +
-                        "height:85px;" +
-                        "margin:0 auto 25px;" +
-                        "border-radius:50%;" +
-                        "background:#dcfce7;" +
-                        "color:#16a34a;" +
-                        "display:flex;" +
-                        "align-items:center;" +
-                        "justify-content:center;" +
-                        "font-size:42px;" +
-                        "font-weight:bold;" +
-                        "}" +
-
-                        "h1{" +
-                        "font-size:28px;" +
-                        "color:#111827;" +
-                        "margin-bottom:12px;" +
-                        "}" +
-
-                        ".message{" +
-                        "font-size:16px;" +
-                        "color:#6b7280;" +
-                        "line-height:1.6;" +
-                        "margin-bottom:30px;" +
-                        "}" +
-
-                        ".job-name{" +
-                        "background:#f3f4f6;" +
-                        "border-radius:12px;" +
-                        "padding:14px;" +
-                        "margin-bottom:25px;" +
-                        "color:#374151;" +
-                        "font-weight:600;" +
-                        "}" +
-
-                        ".buttons{" +
-                        "display:flex;" +
-                        "gap:12px;" +
-                        "justify-content:center;" +
-                        "flex-wrap:wrap;" +
-                        "}" +
-
-                        ".btn{" +
-                        "display:inline-block;" +
-                        "padding:13px 22px;" +
-                        "border-radius:10px;" +
-                        "text-decoration:none;" +
-                        "font-weight:600;" +
-                        "font-size:15px;" +
-                        "}" +
-
-                        ".primary{" +
-                        "background:#2563eb;" +
-                        "color:white;" +
-                        "}" +
-
-                        ".secondary{" +
-                        "background:#f3f4f6;" +
-                        "color:#374151;" +
-                        "}" +
-
-                        ".brand{" +
-                        "font-size:14px;" +
-                        "color:#9ca3af;" +
-                        "margin-top:30px;" +
-                        "}" +
-
-                        ".brand span{" +
-                        "color:#2563eb;" +
-                        "font-weight:bold;" +
-                        "}" +
-
-                        "@media(max-width:500px){" +
-                        ".card{" +
-                        "padding:35px 22px;" +
-                        "}" +
-                        "h1{" +
-                        "font-size:24px;" +
-                        "}" +
-                        ".buttons{" +
-                        "flex-direction:column;" +
-                        "}" +
-                        ".btn{" +
-                        "width:100%;" +
-                        "}" +
-                        "}" +
-
-                        "</style>"
-
-                );
-
-                response.getWriter().println(
-                        "</head>"
-                );
-
-                response.getWriter().println(
-                        "<body>"
-                );
-
-                response.getWriter().println(
-                        "<div class='card'>"
-                );
-
-                response.getWriter().println(
-                        "<div class='success-icon'>✓</div>"
-                );
-
-                response.getWriter().println(
-                        "<h1>Job Posted Successfully!</h1>"
-                );
-
-                response.getWriter().println(
-                        "<p class='message'>" +
-                        "Your job has been successfully published " +
-                        "and is now available on HireHub."
-                        + "</p>"
-                );
-
-                response.getWriter().println(
-                        "<div class='job-name'>" +
-                        "💼 " +
-                        escapeHtml(title) +
-                        "</div>"
-                );
-
-                response.getWriter().println(
-                        "<div class='buttons'>"
-                );
-
-                response.getWriter().println(
-                        "<a class='btn primary' " +
-                        "href='/HireHub/jobs.html'>" +
-                        "View Jobs" +
-                        "</a>"
-                );
-
-                response.getWriter().println(
-                        "<a class='btn secondary' " +
-                        "href='/HireHub/recruiter-dashboard.html'>" +
-                        "Dashboard" +
-                        "</a>"
-                );
-
-                response.getWriter().println(
-                        "</div>"
-                );
-
-                response.getWriter().println(
-                        "<div class='brand'>" +
-                        "Powered by <span>HireHub</span>" +
-                        "</div>"
-                );
-
-                response.getWriter().println(
-                        "</div>"
-                );
-
-                response.getWriter().println(
-                        "</body>"
-                );
-
-                response.getWriter().println(
-                        "</html>"
-                );
-
 
             } else {
 
                 showError(
                         response,
                         "Unable to Post Job!",
-                        "The job could not be added. Please try again."
+                        "The job could not be added. Please try again.",
+                        "/HireHub/post-job.html",
+                        "Back to Post Job"
                 );
-
             }
 
-
         } catch (Exception e) {
+
+            System.out.println(
+                    "PostJobServlet Error: " +
+                    e.getMessage()
+            );
 
             showError(
                     response,
                     "Unable to Post Job!",
-                    "Something went wrong while posting the job."
+                    "Something went wrong while posting the job.",
+                    "/HireHub/post-job.html",
+                    "Back to Post Job"
             );
-
         }
     }
 
+    private void showSuccess(
+            HttpServletResponse response,
+            String title)
+            throws IOException {
+
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        response.setDateHeader(
+                "Expires",
+                0
+        );
+
+        response.getWriter().println(
+
+                "<!DOCTYPE html>" +
+
+                "<html lang='en'>" +
+
+                "<head>" +
+
+                "<meta charset='UTF-8'>" +
+
+                "<meta name='viewport' " +
+                "content='width=device-width, initial-scale=1.0'>" +
+
+                "<title>Job Posted - HireHub</title>" +
+
+                "<style>" +
+
+                "*{" +
+                "box-sizing:border-box;" +
+                "margin:0;" +
+                "padding:0;" +
+                "}" +
+
+                "body{" +
+                "font-family:Arial,Helvetica,sans-serif;" +
+                "background:linear-gradient(135deg,#eef2ff,#f8fafc);" +
+                "min-height:100vh;" +
+                "display:flex;" +
+                "align-items:center;" +
+                "justify-content:center;" +
+                "padding:20px;" +
+                "}" +
+
+                ".card{" +
+                "width:100%;" +
+                "max-width:520px;" +
+                "background:white;" +
+                "border-radius:20px;" +
+                "padding:45px 35px;" +
+                "text-align:center;" +
+                "box-shadow:0 15px 40px rgba(0,0,0,0.12);" +
+                "}" +
+
+                ".success-icon{" +
+                "width:85px;" +
+                "height:85px;" +
+                "margin:0 auto 25px;" +
+                "border-radius:50%;" +
+                "background:#dcfce7;" +
+                "color:#16a34a;" +
+                "display:flex;" +
+                "align-items:center;" +
+                "justify-content:center;" +
+                "font-size:42px;" +
+                "font-weight:bold;" +
+                "}" +
+
+                "h1{" +
+                "font-size:28px;" +
+                "color:#111827;" +
+                "margin-bottom:12px;" +
+                "}" +
+
+                ".message{" +
+                "font-size:16px;" +
+                "color:#6b7280;" +
+                "line-height:1.6;" +
+                "margin-bottom:30px;" +
+                "}" +
+
+                ".job-name{" +
+                "background:#f3f4f6;" +
+                "border-radius:12px;" +
+                "padding:14px;" +
+                "margin-bottom:25px;" +
+                "color:#374151;" +
+                "font-weight:600;" +
+                "}" +
+
+                ".buttons{" +
+                "display:flex;" +
+                "gap:12px;" +
+                "justify-content:center;" +
+                "flex-wrap:wrap;" +
+                "}" +
+
+                ".btn{" +
+                "display:inline-block;" +
+                "padding:13px 22px;" +
+                "border-radius:10px;" +
+                "text-decoration:none;" +
+                "font-weight:600;" +
+                "font-size:15px;" +
+                "}" +
+
+                ".primary{" +
+                "background:#2563eb;" +
+                "color:white;" +
+                "}" +
+
+                ".primary:hover{" +
+                "background:#1d4ed8;" +
+                "}" +
+
+                ".secondary{" +
+                "background:#f3f4f6;" +
+                "color:#374151;" +
+                "}" +
+
+                ".secondary:hover{" +
+                "background:#e5e7eb;" +
+                "}" +
+
+                ".brand{" +
+                "font-size:14px;" +
+                "color:#9ca3af;" +
+                "margin-top:30px;" +
+                "}" +
+
+                ".brand span{" +
+                "color:#2563eb;" +
+                "font-weight:bold;" +
+                "}" +
+
+                "@media(max-width:500px){" +
+
+                ".card{" +
+                "padding:35px 22px;" +
+                "}" +
+
+                "h1{" +
+                "font-size:24px;" +
+                "}" +
+
+                ".buttons{" +
+                "flex-direction:column;" +
+                "}" +
+
+                ".btn{" +
+                "width:100%;" +
+                "}" +
+
+                "}" +
+
+                "</style>" +
+
+                "</head>" +
+
+                "<body>" +
+
+                "<div class='card'>" +
+
+                "<div class='success-icon'>✓</div>" +
+
+                "<h1>Job Posted Successfully!</h1>" +
+
+                "<p class='message'>" +
+                "Your job has been successfully published " +
+                "and is now available on HireHub." +
+                "</p>" +
+
+                "<div class='job-name'>" +
+                "💼 " +
+                escapeHtml(title) +
+                "</div>" +
+
+                "<div class='buttons'>" +
+
+                "<a class='btn primary' " +
+                "href='/HireHub/jobs.html'>" +
+                "View Jobs" +
+                "</a>" +
+
+                "<a class='btn secondary' " +
+                "href='/HireHub/recruiter-dashboard.html'>" +
+                "Dashboard" +
+                "</a>" +
+
+                "</div>" +
+
+                "<div class='brand'>" +
+                "Powered by <span>HireHub</span>" +
+                "</div>" +
+
+                "</div>" +
+
+                "</body>" +
+
+                "</html>"
+        );
+    }
 
     private void showError(
             HttpServletResponse response,
             String title,
-            String message)
+            String message,
+            String buttonLink,
+            String buttonText)
             throws IOException {
 
         response.getWriter().println(
+
                 "<!DOCTYPE html>" +
+
                 "<html lang='en'>" +
 
                 "<head>" +
@@ -363,8 +393,14 @@ public class PostJobServlet extends HttpServlet {
 
                 "<style>" +
 
+                "*{" +
+                "box-sizing:border-box;" +
+                "margin:0;" +
+                "padding:0;" +
+                "}" +
+
                 "body{" +
-                "font-family:Arial,sans-serif;" +
+                "font-family:Arial,Helvetica,sans-serif;" +
                 "background:#f8fafc;" +
                 "min-height:100vh;" +
                 "display:flex;" +
@@ -375,7 +411,7 @@ public class PostJobServlet extends HttpServlet {
 
                 ".card{" +
                 "background:white;" +
-                "padding:45px;" +
+                "padding:45px 35px;" +
                 "border-radius:20px;" +
                 "text-align:center;" +
                 "max-width:500px;" +
@@ -384,17 +420,28 @@ public class PostJobServlet extends HttpServlet {
                 "}" +
 
                 ".icon{" +
-                "font-size:55px;" +
-                "margin-bottom:20px;" +
+                "width:75px;" +
+                "height:75px;" +
+                "border-radius:50%;" +
+                "background:#fee2e2;" +
+                "color:#dc2626;" +
+                "font-size:40px;" +
+                "font-weight:bold;" +
+                "display:flex;" +
+                "align-items:center;" +
+                "justify-content:center;" +
+                "margin:0 auto 20px;" +
                 "}" +
 
                 "h1{" +
-                "color:#dc2626;" +
+                "color:#111827;" +
+                "font-size:26px;" +
                 "margin-bottom:12px;" +
                 "}" +
 
                 "p{" +
                 "color:#6b7280;" +
+                "line-height:1.6;" +
                 "margin-bottom:25px;" +
                 "}" +
 
@@ -408,6 +455,10 @@ public class PostJobServlet extends HttpServlet {
                 "font-weight:bold;" +
                 "}" +
 
+                "a:hover{" +
+                "background:#1d4ed8;" +
+                "}" +
+
                 "</style>" +
 
                 "</head>" +
@@ -416,18 +467,20 @@ public class PostJobServlet extends HttpServlet {
 
                 "<div class='card'>" +
 
-                "<div class='icon'>⚠️</div>" +
+                "<div class='icon'>!</div>" +
 
                 "<h1>" +
-                title +
+                escapeHtml(title) +
                 "</h1>" +
 
                 "<p>" +
-                message +
+                escapeHtml(message) +
                 "</p>" +
 
-                "<a href='/HireHub/recruiter-dashboard.html'>" +
-                "Back to Dashboard" +
+                "<a href='" +
+                buttonLink +
+                "'>" +
+                escapeHtml(buttonText) +
                 "</a>" +
 
                 "</div>" +
@@ -438,8 +491,8 @@ public class PostJobServlet extends HttpServlet {
         );
     }
 
-
-    private String escapeHtml(String value) {
+    private String escapeHtml(
+            String value) {
 
         if (value == null) {
             return "";

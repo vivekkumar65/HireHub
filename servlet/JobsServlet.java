@@ -27,20 +27,39 @@ public class JobsServlet extends HttpServlet {
         String sql = "SELECT * FROM jobs";
 
         try (
-                Connection con = DatabaseConnection.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()
+                Connection con =
+                        DatabaseConnection.getConnection();
+
+                PreparedStatement ps =
+                        con.prepareStatement(sql);
+
+                ResultSet rs =
+                        ps.executeQuery()
         ) {
+
+            boolean jobsFound = false;
 
             while (rs.next()) {
 
-                int jobId = rs.getInt("job_id");
+                jobsFound = true;
 
-                String title = rs.getString("title");
-                String company = rs.getString("company");
-                String location = rs.getString("location");
-                String salary = rs.getString("salary");
-                String skills = rs.getString("skills");
+                int jobId =
+                        rs.getInt("job_id");
+
+                String title =
+                        rs.getString("title");
+
+                String company =
+                        rs.getString("company");
+
+                String location =
+                        rs.getString("location");
+
+                String salary =
+                        rs.getString("salary");
+
+                String skills =
+                        rs.getString("skills");
 
                 out.println("<div class='job-card'>");
 
@@ -52,9 +71,17 @@ public class JobsServlet extends HttpServlet {
 
                 out.println("<div>");
 
-                out.println("<h2>" + title + "</h2>");
+                out.println(
+                        "<h2>" +
+                        escapeHtml(title) +
+                        "</h2>"
+                );
 
-                out.println("<p>" + company + "</p>");
+                out.println(
+                        "<p>" +
+                        escapeHtml(company) +
+                        "</p>"
+                );
 
                 out.println("</div>");
 
@@ -62,11 +89,21 @@ public class JobsServlet extends HttpServlet {
 
                 out.println("<div class='job-info'>");
 
-                out.println("<span>📍 " + location + "</span>");
+                out.println(
+                        "<span>📍 " +
+                        escapeHtml(location) +
+                        "</span>"
+                );
 
-                out.println("<span>💰 " + salary + "</span>");
+                out.println(
+                        "<span>💰 " +
+                        escapeHtml(salary) +
+                        "</span>"
+                );
 
-                out.println("<span>💼 Full Time</span>");
+                out.println(
+                        "<span>💼 Full Time</span>"
+                );
 
                 out.println("</div>");
 
@@ -75,53 +112,86 @@ public class JobsServlet extends HttpServlet {
                 ArrayList<String> skillList =
                         new ArrayList<>();
 
-                if (skills != null && !skills.trim().isEmpty()) {
+                if (skills != null &&
+                    !skills.trim().isEmpty()) {
 
                     String[] skillsArray =
                             skills.split(",");
 
                     for (String skill : skillsArray) {
 
-                        skillList.add(skill.trim());
+                        String cleanSkill =
+                                skill.trim();
+
+                        if (!cleanSkill.isEmpty()) {
+
+                            skillList.add(
+                                    cleanSkill
+                            );
+                        }
                     }
                 }
 
                 for (String skill : skillList) {
 
                     out.println(
-                            "<span>"
-                            + skill
-                            + "</span>"
+                            "<span>" +
+                            escapeHtml(skill) +
+                            "</span>"
                     );
                 }
 
                 out.println("</div>");
 
                 out.println(
-                        "<button class='view-details-btn' " +
+                        "<button " +
+                        "class='view-details-btn' " +
                         "onclick=\"window.location.href=" +
-                        "'job-details.html?jobId="
-                        + jobId
-                        + "'\">"
-                        + "View Details"
-                        + "</button>"
+                        "'job-details.html?jobId=" +
+                        jobId +
+                        "'\">" +
+                        "View Details" +
+                        "</button>"
                 );
 
                 out.println("</div>");
             }
 
+            if (!jobsFound) {
+
+                out.println(
+                        "<p style='text-align:center;'>" +
+                        "No jobs available at the moment." +
+                        "</p>"
+                );
+            }
+
         } catch (Exception e) {
 
-            out.println(
-                    "<p style='text-align:center;'>"
-                    + "Unable to load jobs."
-                    + "</p>"
+            System.out.println(
+                    "JobsServlet Error: " +
+                    e.getMessage()
             );
 
-            System.out.println(
-                    "JobsServlet Error: "
-                    + e.getMessage()
+            out.println(
+                    "<p style='text-align:center;'>" +
+                    "Unable to load jobs. Please try again later." +
+                    "</p>"
             );
         }
+    }
+
+    private String escapeHtml(String value) {
+
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }

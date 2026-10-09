@@ -19,21 +19,49 @@ public class JobDetailsServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType(
+                "application/json;charset=UTF-8"
+        );
 
-        PrintWriter out = response.getWriter();
+        PrintWriter out =
+                response.getWriter();
 
-        String jobId = request.getParameter("jobId");
+        String jobIdText =
+                request.getParameter("jobId");
 
-        if (jobId == null || jobId.isEmpty()) {
+        if (jobIdText == null ||
+            jobIdText.trim().isEmpty()) {
 
-            out.println("{\"error\":\"Job ID is missing\"}");
+            out.println(
+                    "{\"error\":\"Job ID is missing\"}"
+            );
+
+            return;
+        }
+
+        int jobId;
+
+        try {
+
+            jobId =
+                    Integer.parseInt(
+                            jobIdText.trim()
+                    );
+
+        } catch (NumberFormatException e) {
+
+            out.println(
+                    "{\"error\":\"Invalid Job ID\"}"
+            );
+
             return;
         }
 
         String sql =
-                "SELECT * FROM jobs WHERE job_id = ?";
+                "SELECT title, company, location, " +
+                "salary, skills, description " +
+                "FROM jobs " +
+                "WHERE job_id = ?";
 
         try (
                 Connection con =
@@ -43,82 +71,86 @@ public class JobDetailsServlet extends HttpServlet {
                         con.prepareStatement(sql)
         ) {
 
-            ps.setInt(1, Integer.parseInt(jobId));
+            ps.setInt(1, jobId);
 
-            ResultSet rs = ps.executeQuery();
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
 
-            if (rs.next()) {
+                if (rs.next()) {
 
-                String title =
-                        rs.getString("title");
+                    String title =
+                            rs.getString("title");
 
-                String company =
-                        rs.getString("company");
+                    String company =
+                            rs.getString("company");
 
-                String location =
-                        rs.getString("location");
+                    String location =
+                            rs.getString("location");
 
-                String salary =
-                        rs.getString("salary");
+                    String salary =
+                            rs.getString("salary");
 
-                String skills =
-                        rs.getString("skills");
+                    String skills =
+                            rs.getString("skills");
 
-                String description =
-                        rs.getString("description");
+                    String description =
+                            rs.getString("description");
 
-                out.println("{");
+                    out.println("{");
 
-                out.println(
-                        "\"title\":\""
-                        + escapeJson(title)
-                        + "\","
-                );
+                    out.println(
+                            "\"title\":\"" +
+                            escapeJson(title) +
+                            "\","
+                    );
 
-                out.println(
-                        "\"company\":\""
-                        + escapeJson(company)
-                        + "\","
-                );
+                    out.println(
+                            "\"company\":\"" +
+                            escapeJson(company) +
+                            "\","
+                    );
 
-                out.println(
-                        "\"location\":\""
-                        + escapeJson(location)
-                        + "\","
-                );
+                    out.println(
+                            "\"location\":\"" +
+                            escapeJson(location) +
+                            "\","
+                    );
 
-                out.println(
-                        "\"salary\":\""
-                        + escapeJson(salary)
-                        + "\","
-                );
+                    out.println(
+                            "\"salary\":\"" +
+                            escapeJson(salary) +
+                            "\","
+                    );
 
-                out.println(
-                        "\"skills\":\""
-                        + escapeJson(skills)
-                        + "\","
-                );
+                    out.println(
+                            "\"skills\":\"" +
+                            escapeJson(skills) +
+                            "\","
+                    );
 
-                out.println(
-                        "\"description\":\""
-                        + escapeJson(description)
-                        + "\""
-                );
+                    out.println(
+                            "\"description\":\"" +
+                            escapeJson(description) +
+                            "\""
+                    );
 
-                out.println("}");
+                    out.println("}");
 
-            } else {
+                } else {
 
-                out.println(
-                        "{\"error\":\"Job not found\"}"
-                );
+                    out.println(
+                            "{\"error\":\"Job not found\"}"
+                    );
+                }
             }
 
         } catch (Exception e) {
 
             System.out.println(
-                    "JobDetailsServlet Error: "
-                    + e.getMessage()
+                    "JobDetailsServlet Error: " +
+                    e.getMessage()
             );
 
             out.println(
@@ -127,8 +159,8 @@ public class JobDetailsServlet extends HttpServlet {
         }
     }
 
-
-    private String escapeJson(String value) {
+    private String escapeJson(
+            String value) {
 
         if (value == null) {
             return "";
@@ -138,6 +170,9 @@ public class JobDetailsServlet extends HttpServlet {
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
-                .replace("\r", "\\r");
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f");
     }
 }

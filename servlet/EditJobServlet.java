@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
@@ -19,12 +20,23 @@ public class EditJobServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        response.setHeader(
+                "Cache-Control",
+                "no-store, no-cache, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
 
         HttpSession session =
                 request.getSession(false);
 
         if (session == null ||
-            session.getAttribute("userId") == null) {
+                session.getAttribute("userId") == null) {
 
             response.sendRedirect(
                     "/HireHub/login.html"
@@ -37,7 +49,7 @@ public class EditJobServlet extends HttpServlet {
                 (String) session.getAttribute("userRole");
 
         if (role == null ||
-            !role.equalsIgnoreCase("Recruiter")) {
+                !role.equalsIgnoreCase("Recruiter")) {
 
             showError(
                     response,
@@ -48,33 +60,44 @@ public class EditJobServlet extends HttpServlet {
             return;
         }
 
+        Object userIdObject =
+                session.getAttribute("userId");
+
+        if (!(userIdObject instanceof Integer)) {
+
+            response.sendRedirect(
+                    "/HireHub/login.html"
+            );
+
+            return;
+        }
+
         int recruiterId =
-                (Integer) session.getAttribute("userId");
+                (Integer) userIdObject;
 
         String jobIdParameter =
                 request.getParameter("jobId");
 
         String title =
-                request.getParameter("title");
+                clean(request.getParameter("title"));
 
         String company =
-                request.getParameter("company");
+                clean(request.getParameter("company"));
 
         String location =
-                request.getParameter("location");
+                clean(request.getParameter("location"));
 
         String salary =
-                request.getParameter("salary");
+                clean(request.getParameter("salary"));
 
         String skills =
-                request.getParameter("skills");
+                clean(request.getParameter("skills"));
 
         String description =
-                request.getParameter("description");
-
+                clean(request.getParameter("description"));
 
         if (jobIdParameter == null ||
-            jobIdParameter.trim().isEmpty()) {
+                jobIdParameter.trim().isEmpty()) {
 
             showError(
                     response,
@@ -84,7 +107,6 @@ public class EditJobServlet extends HttpServlet {
 
             return;
         }
-
 
         int jobId;
 
@@ -106,6 +128,32 @@ public class EditJobServlet extends HttpServlet {
             return;
         }
 
+        if (jobId <= 0) {
+
+            showError(
+                    response,
+                    "Invalid Job ID!",
+                    "The selected job ID is not valid."
+            );
+
+            return;
+        }
+
+        if (title.isEmpty() ||
+                company.isEmpty() ||
+                location.isEmpty() ||
+                salary.isEmpty() ||
+                skills.isEmpty() ||
+                description.isEmpty()) {
+
+            showError(
+                    response,
+                    "Missing Information!",
+                    "Please fill in all job details before saving."
+            );
+
+            return;
+        }
 
         String sql =
                 "UPDATE jobs SET " +
@@ -117,7 +165,6 @@ public class EditJobServlet extends HttpServlet {
                 "description = ? " +
                 "WHERE job_id = ? " +
                 "AND recruiter_id = ?";
-
 
         try (
                 Connection con =
@@ -136,10 +183,8 @@ public class EditJobServlet extends HttpServlet {
             ps.setInt(7, jobId);
             ps.setInt(8, recruiterId);
 
-
             int rows =
                     ps.executeUpdate();
-
 
             if (rows > 0) {
 
@@ -153,12 +198,16 @@ public class EditJobServlet extends HttpServlet {
                 showError(
                         response,
                         "Job Not Found!",
-                        "This job does not belong to your account."
+                        "This job does not exist or does not belong to your account."
                 );
             }
 
-
         } catch (Exception e) {
+
+            System.err.println(
+                    "EditJobServlet Error: " +
+                    e.getMessage()
+            );
 
             showError(
                     response,
@@ -168,211 +217,212 @@ public class EditJobServlet extends HttpServlet {
         }
     }
 
-
-    // ==========================================
-    // SUCCESS PAGE
-    // ==========================================
-
     private void showSuccess(
             HttpServletResponse response,
             String jobTitle)
             throws IOException {
 
-        response.getWriter().println(
+        PrintWriter out =
+                response.getWriter();
 
-                "<!DOCTYPE html>" +
+        out.println("""
+                <!DOCTYPE html>
+                <html lang="en">
 
-                "<html lang='en'>" +
+                <head>
 
-                "<head>" +
+                    <meta charset="UTF-8">
 
-                "<meta charset='UTF-8'>" +
+                    <meta name="viewport"
+                          content="width=device-width, initial-scale=1.0">
 
-                "<meta name='viewport' " +
-                "content='width=device-width, initial-scale=1.0'>" +
+                    <title>Job Updated - HireHub</title>
 
-                "<meta http-equiv='Cache-Control' " +
-                "content='no-cache, no-store, must-revalidate'>" +
+                    <style>
 
-                "<meta http-equiv='Pragma' content='no-cache'>" +
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                        }
 
-                "<meta http-equiv='Expires' content='0'>" +
+                        body {
+                            font-family: Arial, Helvetica, sans-serif;
+                            background: linear-gradient(
+                                135deg,
+                                #eff6ff,
+                                #f8fafc
+                            );
+                            min-height: 100vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px;
+                        }
 
-                "<title>Job Updated - HireHub</title>" +
+                        .card {
+                            width: 100%;
+                            max-width: 520px;
+                            background: white;
+                            border-radius: 22px;
+                            padding: 45px 35px;
+                            text-align: center;
+                            box-shadow:
+                                0 18px 45px
+                                rgba(0,0,0,0.12);
+                        }
 
-                "<style>" +
+                        .success-icon {
+                            width: 85px;
+                            height: 85px;
+                            margin: 0 auto 25px;
+                            border-radius: 50%;
+                            background: #dbeafe;
+                            color: #2563eb;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 40px;
+                        }
 
-                "*{" +
-                "box-sizing:border-box;" +
-                "margin:0;" +
-                "padding:0;" +
-                "}" +
+                        h1 {
+                            font-size: 28px;
+                            color: #111827;
+                            margin-bottom: 12px;
+                        }
 
-                "body{" +
-                "font-family:Arial,Helvetica,sans-serif;" +
-                "background:linear-gradient(135deg,#eff6ff,#f8fafc);" +
-                "min-height:100vh;" +
-                "display:flex;" +
-                "align-items:center;" +
-                "justify-content:center;" +
-                "padding:20px;" +
-                "}" +
+                        .message {
+                            font-size: 16px;
+                            color: #6b7280;
+                            line-height: 1.6;
+                            margin-bottom: 25px;
+                        }
 
-                ".card{" +
-                "width:100%;" +
-                "max-width:520px;" +
-                "background:white;" +
-                "border-radius:22px;" +
-                "padding:45px 35px;" +
-                "text-align:center;" +
-                "box-shadow:0 18px 45px rgba(0,0,0,0.12);" +
-                "}" +
+                        .job-name {
+                            background: #eff6ff;
+                            border: 1px solid #bfdbfe;
+                            border-radius: 12px;
+                            padding: 15px;
+                            margin-bottom: 28px;
+                            color: #1e40af;
+                            font-weight: 600;
+                        }
 
-                ".success-icon{" +
-                "width:85px;" +
-                "height:85px;" +
-                "margin:0 auto 25px;" +
-                "border-radius:50%;" +
-                "background:#dbeafe;" +
-                "color:#2563eb;" +
-                "display:flex;" +
-                "align-items:center;" +
-                "justify-content:center;" +
-                "font-size:40px;" +
-                "}" +
+                        .buttons {
+                            display: flex;
+                            gap: 12px;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                        }
 
-                "h1{" +
-                "font-size:28px;" +
-                "color:#111827;" +
-                "margin-bottom:12px;" +
-                "}" +
+                        .btn {
+                            display: inline-block;
+                            padding: 13px 22px;
+                            border-radius: 10px;
+                            text-decoration: none;
+                            font-weight: 600;
+                            font-size: 15px;
+                        }
 
-                ".message{" +
-                "font-size:16px;" +
-                "color:#6b7280;" +
-                "line-height:1.6;" +
-                "margin-bottom:25px;" +
-                "}" +
+                        .primary {
+                            background: #2563eb;
+                            color: white;
+                        }
 
-                ".job-name{" +
-                "background:#eff6ff;" +
-                "border:1px solid #bfdbfe;" +
-                "border-radius:12px;" +
-                "padding:15px;" +
-                "margin-bottom:28px;" +
-                "color:#1e40af;" +
-                "font-weight:600;" +
-                "}" +
+                        .secondary {
+                            background: #f3f4f6;
+                            color: #374151;
+                        }
 
-                ".buttons{" +
-                "display:flex;" +
-                "gap:12px;" +
-                "justify-content:center;" +
-                "flex-wrap:wrap;" +
-                "}" +
+                        .primary:hover {
+                            background: #1d4ed8;
+                        }
 
-                ".btn{" +
-                "display:inline-block;" +
-                "padding:13px 22px;" +
-                "border-radius:10px;" +
-                "text-decoration:none;" +
-                "font-weight:600;" +
-                "font-size:15px;" +
-                "}" +
+                        .brand {
+                            font-size: 14px;
+                            color: #9ca3af;
+                            margin-top: 30px;
+                        }
 
-                ".primary{" +
-                "background:#2563eb;" +
-                "color:white;" +
-                "}" +
+                        .brand span {
+                            color: #2563eb;
+                            font-weight: bold;
+                        }
 
-                ".secondary{" +
-                "background:#f3f4f6;" +
-                "color:#374151;" +
-                "}" +
+                        @media (max-width: 500px) {
 
-                ".brand{" +
-                "font-size:14px;" +
-                "color:#9ca3af;" +
-                "margin-top:30px;" +
-                "}" +
+                            .card {
+                                padding: 35px 22px;
+                            }
 
-                ".brand span{" +
-                "color:#2563eb;" +
-                "font-weight:bold;" +
-                "}" +
+                            h1 {
+                                font-size: 24px;
+                            }
 
-                "@media(max-width:500px){" +
+                            .buttons {
+                                flex-direction: column;
+                            }
 
-                ".card{" +
-                "padding:35px 22px;" +
-                "}" +
+                            .btn {
+                                width: 100%;
+                            }
+                        }
 
-                "h1{" +
-                "font-size:24px;" +
-                "}" +
+                    </style>
 
-                ".buttons{" +
-                "flex-direction:column;" +
-                "}" +
+                </head>
 
-                ".btn{" +
-                "width:100%;" +
-                "}" +
+                <body>
 
-                "}" +
+                    <div class="card">
 
-                "</style>" +
+                        <div class="success-icon">
+                            ✓
+                        </div>
 
-                "</head>" +
+                        <h1>
+                            Job Updated Successfully!
+                        </h1>
 
-                "<body>" +
+                        <p class="message">
+                            Your job details have been successfully
+                            updated and the latest information is now
+                            available on HireHub.
+                        </p>
+                """);
 
-                "<div class='card'>" +
-
-                "<div class='success-icon'>✓</div>" +
-
-                "<h1>Job Updated Successfully!</h1>" +
-
-                "<p class='message'>" +
-                "Your job details have been successfully updated " +
-                "and the latest information is now available on HireHub." +
-                "</p>" +
-
-                "<div class='job-name'>" +
-                "💼 " +
+        out.println(
+                "<div class='job-name'>💼 " +
                 escapeHtml(jobTitle) +
-                "</div>" +
-
-                "<div class='buttons'>" +
-
-                "<a class='btn primary' " +
-                "href='/HireHub/my-jobs.html'>" +
-                "Back to My Jobs" +
-                "</a>" +
-
-                "<a class='btn secondary' " +
-                "href='/HireHub/recruiter-dashboard.html'>" +
-                "Dashboard" +
-                "</a>" +
-
-                "</div>" +
-
-                "<div class='brand'>" +
-                "Powered by <span>HireHub</span>" +
-                "</div>" +
-
-                "</div>" +
-
-                "</body>" +
-
-                "</html>"
+                "</div>"
         );
+
+        out.println("""
+                        <div class="buttons">
+
+                            <a class="btn primary"
+                               href="/HireHub/my-jobs.html">
+                                Back to My Jobs
+                            </a>
+
+                            <a class="btn secondary"
+                               href="/HireHub/recruiter-dashboard.html">
+                                Dashboard
+                            </a>
+
+                        </div>
+
+                        <div class="brand">
+                            Powered by <span>HireHub</span>
+                        </div>
+
+                    </div>
+
+                </body>
+
+                </html>
+                """);
     }
-
-
-    // ==========================================
-    // ERROR PAGE
-    // ==========================================
 
     private void showError(
             HttpServletResponse response,
@@ -380,106 +430,129 @@ public class EditJobServlet extends HttpServlet {
             String message)
             throws IOException {
 
-        response.getWriter().println(
+        PrintWriter out =
+                response.getWriter();
 
-                "<!DOCTYPE html>" +
+        out.println("""
+                <!DOCTYPE html>
+                <html lang="en">
 
-                "<html lang='en'>" +
+                <head>
 
-                "<head>" +
+                    <meta charset="UTF-8">
 
-                "<meta charset='UTF-8'>" +
+                    <meta name="viewport"
+                          content="width=device-width, initial-scale=1.0">
 
-                "<meta name='viewport' " +
-                "content='width=device-width, initial-scale=1.0'>" +
+                    <title>HireHub</title>
 
-                "<title>HireHub</title>" +
+                    <style>
 
-                "<style>" +
+                        * {
+                            box-sizing: border-box;
+                        }
 
-                "body{" +
-                "font-family:Arial,Helvetica,sans-serif;" +
-                "background:#f8fafc;" +
-                "min-height:100vh;" +
-                "display:flex;" +
-                "align-items:center;" +
-                "justify-content:center;" +
-                "padding:20px;" +
-                "}" +
+                        body {
+                            margin: 0;
+                            font-family: Arial, Helvetica, sans-serif;
+                            background: #f8fafc;
+                            min-height: 100vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px;
+                        }
 
-                ".card{" +
-                "background:white;" +
-                "padding:45px;" +
-                "border-radius:20px;" +
-                "text-align:center;" +
-                "max-width:500px;" +
-                "width:100%;" +
-                "box-shadow:0 15px 40px rgba(0,0,0,.1);" +
-                "}" +
+                        .card {
+                            background: white;
+                            padding: 45px;
+                            border-radius: 20px;
+                            text-align: center;
+                            max-width: 500px;
+                            width: 100%;
+                            box-shadow:
+                                0 15px 40px
+                                rgba(0,0,0,.1);
+                        }
 
-                ".icon{" +
-                "font-size:55px;" +
-                "margin-bottom:20px;" +
-                "}" +
+                        .icon {
+                            font-size: 55px;
+                            margin-bottom: 20px;
+                        }
 
-                "h1{" +
-                "color:#dc2626;" +
-                "margin-bottom:12px;" +
-                "}" +
+                        h1 {
+                            color: #dc2626;
+                            margin-bottom: 12px;
+                        }
 
-                "p{" +
-                "color:#6b7280;" +
-                "line-height:1.6;" +
-                "margin-bottom:25px;" +
-                "}" +
+                        p {
+                            color: #6b7280;
+                            line-height: 1.6;
+                            margin-bottom: 25px;
+                        }
 
-                "a{" +
-                "display:inline-block;" +
-                "padding:13px 22px;" +
-                "background:#2563eb;" +
-                "color:white;" +
-                "text-decoration:none;" +
-                "border-radius:10px;" +
-                "font-weight:bold;" +
-                "}" +
+                        a {
+                            display: inline-block;
+                            padding: 13px 22px;
+                            background: #2563eb;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 10px;
+                            font-weight: bold;
+                        }
 
-                "</style>" +
+                        a:hover {
+                            background: #1d4ed8;
+                        }
 
-                "</head>" +
+                    </style>
 
-                "<body>" +
+                </head>
 
-                "<div class='card'>" +
+                <body>
 
-                "<div class='icon'>⚠️</div>" +
+                    <div class="card">
 
+                        <div class="icon">
+                            ⚠️
+                        </div>
+                """);
+
+        out.println(
                 "<h1>" +
                 escapeHtml(title) +
-                "</h1>" +
+                "</h1>"
+        );
 
+        out.println(
                 "<p>" +
                 escapeHtml(message) +
-                "</p>" +
-
-                "<a href='/HireHub/my-jobs.html'>" +
-                "Back to My Jobs" +
-                "</a>" +
-
-                "</div>" +
-
-                "</body>" +
-
-                "</html>"
+                "</p>"
         );
+
+        out.println("""
+                        <a href="/HireHub/my-jobs.html">
+                            Back to My Jobs
+                        </a>
+
+                    </div>
+
+                </body>
+
+                </html>
+                """);
     }
 
+    private String clean(String value) {
 
-    // ==========================================
-    // HTML ESCAPE
-    // ==========================================
+        if (value == null) {
+            return "";
+        }
 
-    private String escapeHtml(
-            String value) {
+        return value.trim();
+    }
+
+    private String escapeHtml(String value) {
 
         if (value == null) {
             return "";

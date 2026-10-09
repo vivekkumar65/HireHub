@@ -23,30 +23,60 @@ public class ProfileServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        PrintWriter out = response.getWriter();
+        response.setHeader(
+                "Cache-Control",
+                "no-store, no-cache, must-revalidate"
+        );
 
-        // Current login session
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        PrintWriter out =
+                response.getWriter();
+
         HttpSession session =
                 request.getSession(false);
 
-        // Login check
         if (session == null ||
-            session.getAttribute("userId") == null) {
+                session.getAttribute("userId") == null) {
 
             out.println(
-                "{\"error\":\"Please login first\"}"
+                    "{\"error\":\"Please login first\"}"
             );
 
             return;
         }
 
-        // Logged-in user's ID
+        Object userIdObject =
+                session.getAttribute("userId");
+
+        if (!(userIdObject instanceof Integer)) {
+
+            out.println(
+                    "{\"error\":\"Invalid session\"}"
+            );
+
+            return;
+        }
+
         int userId =
-                (Integer) session.getAttribute("userId");
+                (Integer) userIdObject;
+
+        if (userId <= 0) {
+
+            out.println(
+                    "{\"error\":\"Invalid user ID\"}"
+            );
+
+            return;
+        }
 
         String sql =
                 "SELECT name, email, role " +
-                "FROM users WHERE user_id = ?";
+                "FROM users " +
+                "WHERE user_id = ?";
 
         try (
                 Connection con =
@@ -58,54 +88,65 @@ public class ProfileServlet extends HttpServlet {
 
             ps.setInt(1, userId);
 
-            ResultSet rs =
-                    ps.executeQuery();
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
 
-            if (rs.next()) {
+                if (rs.next()) {
 
-                out.println("{");
+                    String name =
+                            rs.getString("name");
 
-                out.println(
-                    "\"name\":\""
-                    + escapeJson(rs.getString("name"))
-                    + "\","
-                );
+                    String email =
+                            rs.getString("email");
 
-                out.println(
-                    "\"email\":\""
-                    + escapeJson(rs.getString("email"))
-                    + "\","
-                );
+                    String role =
+                            rs.getString("role");
 
-                out.println(
-                    "\"role\":\""
-                    + escapeJson(rs.getString("role"))
-                    + "\""
-                );
+                    out.println("{");
 
-                out.println("}");
+                    out.println(
+                            "\"name\":\"" +
+                            escapeJson(name) +
+                            "\","
+                    );
 
-            } else {
+                    out.println(
+                            "\"email\":\"" +
+                            escapeJson(email) +
+                            "\","
+                    );
 
-                out.println(
-                    "{\"error\":\"User not found\"}"
-                );
+                    out.println(
+                            "\"role\":\"" +
+                            escapeJson(role) +
+                            "\""
+                    );
+
+                    out.println("}");
+
+                } else {
+
+                    out.println(
+                            "{\"error\":\"User not found\"}"
+                    );
+                }
             }
 
         } catch (Exception e) {
 
-            out.println(
-                "{\"error\":\"Unable to load profile\"}"
+            System.err.println(
+                    "ProfileServlet Error: " +
+                    e.getMessage()
             );
 
-            System.out.println(
-                "ProfileServlet Error: "
-                + e.getMessage()
+            out.println(
+                    "{\"error\":\"Unable to load profile\"}"
             );
         }
     }
 
-    // JSON special characters handle karne ke liye
     private String escapeJson(String value) {
 
         if (value == null) {
@@ -115,7 +156,10 @@ public class ProfileServlet extends HttpServlet {
         return value
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
                 .replace("\n", "\\n")
-                .replace("\r", "\\r");
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }
